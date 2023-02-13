@@ -27,7 +27,7 @@ import java.lang.ref.SoftReference
  * Contains dialog properties with setters and getters.
  *
  * @since    0.5.1
- * @version  1.2.1
+ * @version  2.0.0
  * @author   Alexander Savin
  * @author   Shintaro Katafuchi
  */
@@ -240,13 +240,13 @@ class DialogOptions internal constructor() {
     }
 
     /** The Rate Dialog buttons listener implemented by a library user. */
-    private var buttonListener: OnClickButtonListener? = null
+    private var buttonListener: SoftReference<OnClickButtonListener>? = null
     /**
      * Returns the Rate Dialog buttons on-click listener implemented by a library user.
      *
      * @return the Rate Dialog buttons on-click listener
      */
-    fun getButtonListener(): OnClickButtonListener? = buttonListener
+    fun getButtonListener(): OnClickButtonListener? = buttonListener?.get()
     /**
      * Sets a listener on the Rate Dialog buttons implemented by a library
      * user.
@@ -254,7 +254,7 @@ class DialogOptions internal constructor() {
      * @param buttonListener the Rate Dialog buttons on-click listener
      */
     fun setButtonListener(buttonListener: OnClickButtonListener?) {
-        this.buttonListener = buttonListener
+        this.buttonListener = SoftReference(buttonListener)
     }
 
     /** The Rate Dialog icon. */

@@ -22,7 +22,7 @@ import java.util.Date;
  * <p>PreferenceHelper Class - preference helper class of the AndroidRate library.</p>
  *
  * @since    0.1.3
- * @version  1.2.1
+ * @version  2.0.0
  * @author   Alexander Savin
  * @author   Shintaro Katafuchi
  */
@@ -38,11 +38,11 @@ final class PreferenceHelper {
 
     private static final String PREF_KEY_INSTALL_DATE = "androidrate_install_date";
 
-    private static final String PREF_KEY_AGREED_OR_DECLINED = "androidrate_agreed_or_declined";
+    private static final String PREF_KEY_AGREED_OR_DECLINED = "androidrate_is_agree_show_dialog";
 
     private static final String PREF_KEY_LAUNCH_TIMES = "androidrate_launch_times";
 
-    private static final String PREF_KEY_LAST_TIME_SHOWN = "androidrate_last_time_shown";
+    private static final String PREF_KEY_LAST_TIME_SHOWN = "androidrate_remind_interval";
 
     private static final String PREF_KEY_REMIND_LAUNCHES_NUMBER = "androidrate_remind_launches_number";
 

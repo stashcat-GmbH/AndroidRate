@@ -23,8 +23,6 @@ ext {
     ]
 
     ktx = [
-            // TODO: 1.9.0 Requires SDK 33
-//            core : '1.8.0',
             coroutines : '1.6.4'
     ]
 
