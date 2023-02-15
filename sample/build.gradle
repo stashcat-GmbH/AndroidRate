@@ -4,29 +4,37 @@
  * Licensed under The MIT License (MIT)
  */
 
-apply plugin: 'com.android.application'
+plugins {
+    id("com.android.application")
+    id("kotlin-android")
+    id("kotlin-kapt")
+}
 
 android {
-    signingConfigs {
-        config {
-            storeFile file(System.getenv('STOREFILE'))
-            storePassword System.getenv('STOREPWD')
-            keyAlias 'Vorlonsoft LLC'
-            keyPassword System.getenv('KEYPWD')
-        }
-    }
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+//    signingConfigs {
+//        config {
+//            storeFile file(System.getenv('STOREFILE'))
+//            storePassword System.getenv('STOREPWD')
+//            keyAlias 'Vorlonsoft LLC'
+//            keyPassword System.getenv('KEYPWD')
+//        }
+//    }
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
     defaultConfig {
         applicationId 'com.vorlonsoft.android.rate.sample'
-        minSdkVersion 14
-        targetSdkVersion 28
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.compileSdkVersion
         versionCode version_code
         versionName version
     }
     compileOptions {
-        sourceCompatibility java_version
-        targetCompatibility java_version
+        sourceCompatibility rootProject.ext.javaVersion
+        targetCompatibility rootProject.ext.javaVersion
+    }
+    kotlinOptions {
+        jvmTarget = rootProject.ext.javaVersion
     }
     bundle {
         language {
@@ -47,7 +55,6 @@ android {
             embedMicroApp false
         }
         release {
-            signingConfig signingConfigs.config
             applicationIdSuffix ''
             zipAlignEnabled true
             debuggable false
@@ -72,6 +79,7 @@ android {
             matchingFallbacks = ['release']
         }
     }
+    namespace 'com.vorlonsoft.android.rate.sample'
     applicationVariants.all { variant ->
         variant.outputs.all {
             outputFileName = "${variant.name}-${variant.versionName}.apk"
@@ -80,7 +88,8 @@ android {
 }
 dependencies {
     implementation project(':library')
-    implementation 'com.google.android.gms:play-services-base:16.0.1'
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.1'
-    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.1'
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:${androidx.lifecycle}"
+    implementation "androidx.constraintlayout:constraintlayout:${androidx.constraintlayout}"
+    implementation 'com.google.android.gms:play-services-base:18.1.0'
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:${squareup.leakcanary}"
 }
