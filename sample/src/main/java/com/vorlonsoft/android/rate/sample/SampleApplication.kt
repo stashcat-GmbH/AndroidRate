@@ -8,6 +8,7 @@ package com.vorlonsoft.android.rate.sample
 import android.app.Application
 import android.util.Log
 import com.vorlonsoft.android.rate.*
+import kotlin.time.Duration.Companion.days
 
 class SampleApplication : Application() {
     companion object {
@@ -42,26 +43,20 @@ class SampleApplication : Application() {
         /* comment if you don't want to test AppCompatDialogManager instead DefaultDialogManager */
         val appCompatDialogManagerFactory: DialogManager.Factory = AppCompatDialogManager.Factory()
         AppRate.with(applicationContext)
-            /* default is GOOGLEPLAY (Google Play), other options are AMAZON (Amazon Appstore), BAZAAR (Cafe Bazaar),
-             *         CHINESESTORES (19 chinese app stores), MI (Mi Appstore (Xiaomi Market)), SAMSUNG (Samsung Galaxy Apps),
-             *         SLIDEME (SlideME Marketplace), TENCENT (Tencent App Store), YANDEX (Yandex.Store),
-             *         setStoreType(BLACKBERRY, long) (BlackBerry World, long - your application ID),
-             *         setStoreType(APPLE, long) (Apple App Store, long - your application ID),
-             *         setStoreType(String...) (Any other store/stores, String... - an URI or array of URIs to your app) and
-             *         setStoreType(Intent...) (Any custom intent/intents, Intent... - an intent or array of intents) */
+            // default is GOOGLEPLAY (Google Play), other options are AMAZON (Amazon Appstore), BAZAAR (Cafe Bazaar),
+            //      CHINESESTORES (19 chinese app stores), MI (Mi Appstore (Xiaomi Market)), SAMSUNG (Samsung Galaxy Apps),
+            //      SLIDEME (SlideME Marketplace), TENCENT (Tencent App Store), YANDEX (Yandex.Store),
+            //      setStoreType(BLACKBERRY, long) (BlackBerry World, long - your application ID),
+            //      setStoreType(APPLE, long) (Apple App Store, long - your application ID),
+            //      setStoreType(String...) (Any other store/stores, String... - an URI or array of URIs to your app) and
+            //      setStoreType(Intent...) (Any custom intent/intents, Intent... - an intent or array of intents) */
             .setStoreType(StoreType.GOOGLEPLAY)
-            // default is 10 days, 0 means install millisecond, 10 means app is launched 10 or more time units later than installation
-            .setTimeToWait(
-                Time.DAY,
-                3.toShort()
-            )
+            // default is 10 days, 10 days mean dialog is shown 10 days after installation (first app launch), 0 means install millisecond
+            .setTimeToWaitAfterInstall(3.days)
             // default is 10, 3 means app is launched 3 or more times
             .setLaunchTimes(10.toByte())
             // default is 1 day, 1 means app is launched 1 or more time units after neutral button clicked
-            .setRemindTimeToWait(
-                Time.DAY,
-                2.toShort()
-            )
+            .setRemindTimeToWait(2.days)
             // default is 0, 1 means app is launched 1 or more times after neutral button clicked
             .setRemindLaunchesNumber(1.toByte())
             // default is 1, 1 means each launch, 2 means every 2nd launch, 3 means every 3rd launch, etc
@@ -82,7 +77,9 @@ class SampleApplication : Application() {
                 override fun onClickButton(which: Byte) {
                     Log.d(TAG, "RateButton: $which")
                 }
-            }) /* uncomment to test AppCompatDialogManager instead DefaultDialogManager */ //.setDialogManagerFactory(appCompatDialogManagerFactory)
+            })
+            /* uncomment to test AppCompatDialogManager instead DefaultDialogManager */
+            //.setDialogManagerFactory(appCompatDialogManagerFactory)
             /* comment to use library strings instead app strings - start */
             .setTitle(R.string.new_rate_dialog_title)
             /* comment to use library strings instead app strings - end */ /* uncomment to use app string instead library string */ //.setMessage(R.string.new_rate_dialog_message)

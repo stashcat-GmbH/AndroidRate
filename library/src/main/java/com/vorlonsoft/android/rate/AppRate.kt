@@ -71,7 +71,7 @@ class AppRate private constructor(context: Context) {
          * @return true if the Rate Dialog is shown, false otherwise
          */
         suspend fun showRateDialogIfMeetsConditions(activity: Activity): Boolean {
-            INSTANCE?.let {
+            with(activity).let {
                 if (it.isDebug || it.shouldShowRateDialog()) {
                     if (it.storeOptions.storeType == StoreType.GOOGLEPLAY && it.useGoogleInAppReview) {
                         it.launchGoogleInAppReview(activity)
@@ -237,7 +237,7 @@ class AppRate private constructor(context: Context) {
      * @param waitDuration Duration to wait after install
      * @return the [AppRate] singleton object
      */
-    fun setTimeToWaitAfterInstall(waitDuration: Duration) {
+    fun setTimeToWaitAfterInstall(waitDuration: Duration): AppRate = apply {
         installWaitDuration = waitDuration
     }
 
