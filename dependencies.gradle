@@ -23,7 +23,8 @@ ext {
     ]
 
     ktx = [
-            coroutines : '1.6.4'
+            coroutines : '1.6.4',
+            core : '1.8.0'
     ]
 
     squareup = [

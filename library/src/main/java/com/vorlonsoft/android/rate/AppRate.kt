@@ -747,14 +747,14 @@ class AppRate private constructor(context: Context) {
     private fun isGoogleInAppReview() =
         useGoogleInAppReview && storeOptions.storeType == StoreType.GOOGLEPLAY
 
-    fun incrementEventCount(eventName: String?): AppRate {
+    fun incrementEventCount(eventName: String): AppRate {
         return setEventCountValue(
             eventName,
             (PreferenceHelper.getCustomEventCount(context, eventName) + 1).toShort()
         )
     }
 
-    fun setEventCountValue(eventName: String?, countValue: Short): AppRate = apply {
+    fun setEventCountValue(eventName: String, countValue: Short): AppRate = apply {
         PreferenceHelper.setCustomEventCount(context, eventName, countValue)
     }
 

@@ -56,6 +56,7 @@ dependencies {
     api "androidx.appcompat:appcompat:${androidx.appcompat}"
     androidTestImplementation "androidx.test:runner:${androidxTest.runner}"
     // Kotlin
+    implementation "androidx.core:core-ktx:${ktx.core}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${ktx.coroutines}"
     implementation "com.google.android.play:review:${google.review}"
 }
