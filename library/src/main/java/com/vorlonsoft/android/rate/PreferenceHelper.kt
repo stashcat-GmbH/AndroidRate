@@ -13,6 +13,7 @@ import com.vorlonsoft.android.rate.Constants.Date.YEAR_IN_DAYS
 import com.vorlonsoft.android.rate.Constants.Utils.EMPTY_STRING
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.time.Duration
 
 /**
  *
@@ -38,11 +39,14 @@ internal object PreferenceHelper {
     private const val PREF_KEY_LAUNCH_TIMES = "androidrate_launch_times"
     private const val PREF_KEY_LAST_TIME_SHOWN = "androidrate_remind_interval"
     private const val PREF_KEY_REMIND_LAUNCHES_NUMBER = "androidrate_remind_launches_number"
+    private const val PREF_KEY_DELAY_DATE = "androidrate_delay_date"
     private const val PREF_KEY_VERSION_CODE = "androidrate_version_code"
     private const val PREF_KEY_VERSION_NAME = "androidrate_version_name"
     private const val NUMERIC_MASK = "(0|[1-9]\\d*)"
     private const val DEFAULT_DIALOG_LAUNCH_TIMES = ":0y0-0:"
     private const val CURRENT_DAY_LAUNCHES_MASK = "-$NUMERIC_MASK:"
+
+    private const val UNSET_DELAY_DATE = -1L
 
     private fun Context.getPreferences() =
         getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
@@ -88,14 +92,11 @@ internal object PreferenceHelper {
      * @param context context
      */
     @JvmStatic
-    fun clearSharedPreferences(context: Context) {
-        context.editPrefs { clear() }
-    }
+    fun clearSharedPreferences(context: Context) = context.editPrefs { clear() }
 
     @JvmStatic
-    fun isFirstLaunch(context: Context): Boolean {
-        return context.getPreferences().getLong(PREF_KEY_INSTALL_DATE, 0L) == 0L
-    }
+    fun isFirstLaunch(context: Context): Boolean =
+        context.getPreferences().getLong(PREF_KEY_INSTALL_DATE, 0L) == 0L
 
     @JvmStatic
     fun setFirstLaunchSharedPreferences(context: Context) {
@@ -197,34 +198,24 @@ internal object PreferenceHelper {
     }
 
     @JvmStatic
-    fun setCustomEventCount(context: Context, eventName: String, eventCount: Short) {
-        context.editPrefs {
-            putInt(PREF_KEY_CUSTOM_EVENT_PREFIX + eventName, eventCount.toInt())
-        }
-    }
+    fun setCustomEventCount(context: Context, eventName: String, eventCount: Short) =
+        context.editPrefs { putInt(PREF_KEY_CUSTOM_EVENT_PREFIX + eventName, eventCount.toInt()) }
 
     @JvmStatic
-    fun getCustomEventCount(context: Context, eventName: String): Short {
-        return context.getPreferences().getInt(PREF_KEY_CUSTOM_EVENT_PREFIX + eventName, 0)
-            .toShort()
-    }
+    fun getCustomEventCount(context: Context, eventName: String): Short =
+        context.getPreferences().getInt(PREF_KEY_CUSTOM_EVENT_PREFIX + eventName, 0).toShort()
 
     @JvmStatic
-    fun setDialogFirstLaunchTime(context: Context) {
-        context.editPrefs {
-            putLong(PREF_KEY_DIALOG_FIRST_LAUNCH_TIME, Date().time)
-        }
-    }
+    fun setDialogFirstLaunchTime(context: Context) =
+        context.editPrefs { putLong(PREF_KEY_DIALOG_FIRST_LAUNCH_TIME, Date().time) }
 
     @JvmStatic
-    fun getDialogFirstLaunchTime(context: Context): Long {
-        return context.getPreferences().getLong(PREF_KEY_DIALOG_FIRST_LAUNCH_TIME, 0L)
-    }
+    fun getDialogFirstLaunchTime(context: Context): Long =
+        context.getPreferences().getLong(PREF_KEY_DIALOG_FIRST_LAUNCH_TIME, 0L)
 
     @JvmStatic
-    fun getInstallDate(context: Context): Long {
-        return context.getPreferences().getLong(PREF_KEY_INSTALL_DATE, 0L)
-    }
+    fun getInstallDate(context: Context): Long =
+        context.getPreferences().getLong(PREF_KEY_INSTALL_DATE, 0L)
 
     /**
      *
@@ -237,16 +228,12 @@ internal object PreferenceHelper {
      * @param agreedOrDeclined the Rate Dialog agree flag
      */
     @JvmStatic
-    fun setAgreedOrDeclined(context: Context, agreedOrDeclined: Boolean) {
-        context.editPrefs {
-            putBoolean(PREF_KEY_AGREED_OR_DECLINED, agreedOrDeclined)
-        }
-    }
+    fun setAgreedOrDeclined(context: Context, agreedOrDeclined: Boolean) =
+        context.editPrefs { putBoolean(PREF_KEY_AGREED_OR_DECLINED, agreedOrDeclined) }
 
     @JvmStatic
-    fun getAgreedOrDeclined(context: Context): Boolean {
-        return context.getPreferences().getBoolean(PREF_KEY_AGREED_OR_DECLINED, false)
-    }
+    fun getAgreedOrDeclined(context: Context): Boolean =
+        context.getPreferences().getBoolean(PREF_KEY_AGREED_OR_DECLINED, false)
 
     /**
      *
@@ -256,28 +243,20 @@ internal object PreferenceHelper {
      * @param launchTimes number of launch times to set
      */
     @JvmStatic
-    fun setLaunchTimes(context: Context, launchTimes: Short) {
-        context.editPrefs {
-            putInt(PREF_KEY_LAUNCH_TIMES, launchTimes.toInt())
-        }
-    }
+    fun setLaunchTimes(context: Context, launchTimes: Short) =
+        context.editPrefs { putInt(PREF_KEY_LAUNCH_TIMES, launchTimes.toInt()) }
 
     @JvmStatic
-    fun getLaunchTimes(context: Context): Short {
-        return context.getPreferences().getInt(PREF_KEY_LAUNCH_TIMES, 0).toShort()
-    }
+    fun getLaunchTimes(context: Context): Short =
+        context.getPreferences().getInt(PREF_KEY_LAUNCH_TIMES, 0).toShort()
 
     @JvmStatic
-    fun setLastTimeShown(context: Context) {
-        context.editPrefs {
-            putLong(PREF_KEY_LAST_TIME_SHOWN, Date().time)
-        }
-    }
+    fun setLastTimeShown(context: Context) =
+        context.editPrefs { putLong(PREF_KEY_LAST_TIME_SHOWN, Date().time) }
 
     @JvmStatic
-    fun getLastTimeShown(context: Context): Long {
-        return context.getPreferences().getLong(PREF_KEY_LAST_TIME_SHOWN, 0L)
-    }
+    fun getLastTimeShown(context: Context): Long =
+        context.getPreferences().getLong(PREF_KEY_LAST_TIME_SHOWN, 0L)
 
     /**
      *
@@ -288,16 +267,17 @@ internal object PreferenceHelper {
      * @param context context
      */
     @JvmStatic
-    fun setRemindLaunchesNumber(context: Context) {
+    fun setRemindLaunchesNumber(context: Context) =
         context.editPrefs {
-            putInt(PREF_KEY_REMIND_LAUNCHES_NUMBER, getLaunchTimes(context).toInt())
+            putInt(
+                PREF_KEY_REMIND_LAUNCHES_NUMBER,
+                getLaunchTimes(context).toInt()
+            )
         }
-    }
 
     @JvmStatic
-    fun getRemindLaunchesNumber(context: Context): Short {
-        return context.getPreferences().getInt(PREF_KEY_REMIND_LAUNCHES_NUMBER, 0).toShort()
-    }
+    fun getRemindLaunchesNumber(context: Context): Short =
+        context.getPreferences().getInt(PREF_KEY_REMIND_LAUNCHES_NUMBER, 0).toShort()
 
     /**
      *
@@ -306,36 +286,32 @@ internal object PreferenceHelper {
      * @param context context
      */
     @JvmStatic
-    fun clearRemindButtonClick(context: Context) {
+    fun clearRemindButtonClick(context: Context) =
         context.editPrefs {
             putLong(PREF_KEY_LAST_TIME_SHOWN, 0L)
             putInt(PREF_KEY_REMIND_LAUNCHES_NUMBER, 0)
         }
-    }
 
     @JvmStatic
-    fun setVersionCode(context: Context) {
+    fun setVersionCode(context: Context) =
+        context.editPrefs { putLong(PREF_KEY_VERSION_CODE, getLongVersionCode(context)) }
+
+    @JvmStatic
+    fun getVersionCode(context: Context): Long =
+        context.getPreferences().getLong(PREF_KEY_VERSION_CODE, 0L)
+
+    @JvmStatic
+    fun setVersionName(context: Context) =
         context.editPrefs {
-            putLong(PREF_KEY_VERSION_CODE, getLongVersionCode(context))
+            putString(
+                PREF_KEY_VERSION_NAME,
+                AppInformation.getVersionName(context)
+            )
         }
-    }
 
     @JvmStatic
-    fun getVersionCode(context: Context): Long {
-        return context.getPreferences().getLong(PREF_KEY_VERSION_CODE, 0L)
-    }
-
-    @JvmStatic
-    fun setVersionName(context: Context) {
-        context.editPrefs {
-            putString(PREF_KEY_VERSION_NAME, AppInformation.getVersionName(context))
-        }
-    }
-
-    @JvmStatic
-    fun getVersionName(context: Context): String? {
-        return context.getPreferences().getString(PREF_KEY_VERSION_NAME, EMPTY_STRING)
-    }
+    fun getVersionName(context: Context): String? =
+        context.getPreferences().getString(PREF_KEY_VERSION_NAME, EMPTY_STRING)
 
     @JvmStatic
     fun dialogShown(context: Context) {
@@ -349,5 +325,31 @@ internal object PreferenceHelper {
     fun setReminderToShowAgain(context: Context) {
         setLastTimeShown(context)
         setRemindLaunchesNumber(context)
+    }
+
+    @JvmStatic
+    fun getDelay(context: Context): Long =
+        context.getPreferences().getLong(PREF_KEY_DELAY_DATE, UNSET_DELAY_DATE)
+
+    @JvmStatic
+    fun setDelay(context: Context, delay: Duration) =
+        context.editPrefs {
+            putLong(PREF_KEY_DELAY_DATE, Date().time + delay.inWholeMilliseconds)
+        }
+
+    @JvmStatic
+    fun setDelayUntil(context: Context, date: Date) =
+        context.editPrefs { putLong(PREF_KEY_DELAY_DATE, date.time) }
+
+    @JvmStatic
+    fun addDelay(context: Context, delay: Duration) {
+        var currentDelay: Long =
+            context.getPreferences().getLong(PREF_KEY_DELAY_DATE, UNSET_DELAY_DATE)
+        if (currentDelay == UNSET_DELAY_DATE) {
+            currentDelay = Date().time
+        }
+        context.editPrefs {
+            putLong(PREF_KEY_DELAY_DATE, currentDelay + delay.inWholeMilliseconds)
+        }
     }
 }

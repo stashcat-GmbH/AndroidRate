@@ -18,6 +18,7 @@ import androidx.annotation.LongDef
  * @version     2.0.0
  * @author      Alexander Savin
  */
+@Deprecated("Use kotlin.time instead")
 open class Time {
     /**
      * Denotes that the annotated element of the primitive type long represents a logical type and
@@ -31,6 +32,7 @@ open class Time {
     @MustBeDocumented
     @Retention(AnnotationRetention.SOURCE)
     @LongDef(MILLISECOND, SECOND, MINUTE, HOUR, DAY, WEEK, MONTH, YEAR)
+    @Deprecated("Use kotlin.time instead")
     annotation class TimeUnits
 
     /** Contains constants for units of time in milliseconds. */
