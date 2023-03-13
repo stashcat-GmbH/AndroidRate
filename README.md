@@ -33,90 +33,101 @@ on this [Project](https://github.com/hotchemi/Android-Rate).
 ### Configuration
 
 AndroidRate library provides methods to configure it's behavior. Select the type of configuration
-that best describes your needs.
+that best describes your needs. The configuration is best setup in your App's Application class.
+The rating dialog itself should be shown at your own discretion,
+[the Android Documentation](https://developer.android.com/guide/playcore/in-app-review#when-to-request)
+has some advice about when to show app rating dialogs.
 
 #### Nano configuration
 
 Uses library's defaults.
 
-```java
-@Override
-protected void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-
-        AppRate.quickStart(this); // Monitors the app launch times and shows the Rate Dialog when default conditions are met
-        }
+```kotlin
+// in activity
+AppRate.quickStart(activity)
 ```
 
 #### Micro configuration
 
 Configures basic library behavior only.
 
-```java
-@Override
-protected void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-
-        AppRate.with(this)
-        .setInstallDays((byte)0)                  // default is 10, 0 means install day, 10 means app is launched 10 or more days later than installation
-        .setLaunchTimes((byte)3)                  // default is 10, 3 means app is launched 3 or more times
-        .setRemindInterval((byte)1)               // default is 1, 1 means app is launched 1 or more days after neutral button clicked
-        .setRemindLaunchesNumber((byte)1)         // default is 0, 1 means app is launched 1 or more times after neutral button clicked
-        .monitor();                                // Monitors the app launch times
-        AppRate.showRateDialogIfMeetsConditions(this); // Shows the Rate Dialog when conditions are met
-        }
+```kotlin
+// in application
+AppRate.with(applicationContext)
+    // default is 10 days, 10 days mean dialog is shown 10 days after first app launch
+    .setTimeToWaitAfterInstall(3.days)
+    // default is 10, 10 means app is launched 10 or more times
+    .setLaunchTimes(10.toByte())
+    // default is 1 day, 1 day means app is launched 1 day or more after neutral button clicked
+    .setRemindTimeToWait(2.days)
+    // default is 0, 1 means app is launched 1 or more times after neutral button clicked
+    .setRemindLaunchesNumber(1.toByte())
+    .monitor()
 ```
+
+```kotlin
+// in activity
+lifecycleScope.launch {
+    repeatOnLifecycle(Lifecycle.State.STARTED) {
+        // check if play store / network is available
+        AppRate.showRateDialogIfMeetsConditions(activity)
+    }
+}
+```
+Also see [Check for Google Play](#check-for-google-play)
 
 #### Standard configuration
 
 The choice of most corporate developers.
 
-```java
-@Override
-protected void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-
-        AppRate.with(this)
-        .setStoreType(StoreType.GOOGLEPLAY) /* default is GOOGLEPLAY (Google Play), other options are AMAZON (Amazon Appstore), BAZAAR (Cafe Bazaar),
- *         CHINESESTORES (19 chinese app stores), MI (Mi Appstore (Xiaomi Market)), SAMSUNG (Samsung Galaxy Apps),
- *         SLIDEME (SlideME Marketplace), TENCENT (Tencent App Store), YANDEX (Yandex.Store),
- *         setStoreType(BLACKBERRY, long) (BlackBerry World, long - your application ID),
- *         setStoreType(APPLE, long) (Apple App Store, long - your application ID),
- *         setStoreType(String...) (Any other store/stores, String... - an URI or array of URIs to your app) and
- *         setStoreType(Intent...) (Any custom intent/intents, Intent... - an intent or array of intents) */
-        .setTimeToWait(Time.DAY,(short)0) // default is 10 days, 0 means install millisecond, 10 means app is launched 10 or more time units later than installation
-        .setLaunchTimes((byte)3)           // default is 10, 3 means app is launched 3 or more times
-        .setRemindTimeToWait(Time.DAY,(short)2) // default is 1 day, 1 means app is launched 1 or more time units after neutral button clicked
-        .setRemindLaunchesNumber((byte)1)  // default is 0, 1 means app is launched 1 or more times after neutral button clicked
-        .setSelectedAppLaunches((byte)1)   // default is 1, 1 means each launch, 2 means every 2nd launch, 3 means every 3rd launch, etc
-        .setShowLaterButton(true)           // default is true, true means to show the Neutral button ("Remind me later").
-        .set365DayPeriodMaxNumberDialogLaunchTimes((short)3) // default is unlimited, 3 means 3 or less occurrences of the display of the Rate Dialog within a 365-day period
-        .setVersionCodeCheck(true)          // default is false, true means to re-enable the Rate Dialog if a new version of app with different version code is installed
-        .setVersionNameCheck(true)          // default is false, true means to re-enable the Rate Dialog if a new version of app with different version name is installed
-        .setDebug(false)                    // default is false, true is for development only, true ensures that the Rate Dialog will be shown each time the app is launched
-        .setOnClickButtonListener(which->Log.d(this.getLocalClassName(),Byte.toString(which))) // Java 8+, change for Java 7-
-        .monitor();                         // Monitors the app launch times
-
-        if(AppRate.with(this).getStoreType()==StoreType.GOOGLEPLAY){ // Checks that current app store type from library options is StoreType.GOOGLEPLAY
-        if(GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)!=ConnectionResult.SERVICE_MISSING){ // Checks that Google Play is available
-        AppRate.showRateDialogIfMeetsConditions(this); // Shows the Rate Dialog when conditions are met
+```kotlin
+// in application
+AppRate.with(applicationContext)
+    // default is GOOGLEPLAY (Google Play) for other options have a look at the Appstores section
+    .setStoreType(StoreType.GOOGLEPLAY)
+    // use this when you want to use the google in-app review API
+    // if set, a google play store app review dialog is shown directly in the app
+    .useGoogleInAppReview()
+    // default is 10 days, 10 days mean dialog is shown 10 days after first app launch
+    .setTimeToWaitAfterInstall(3.days)
+    // default is 10, 10 means app is launched 10 or more times
+    .setLaunchTimes(10.toByte())
+    // default is 1 day, 1 day means app is launched 1 day or more after neutral button clicked
+    .setRemindTimeToWait(2.days)
+    // default is 0, 1 means app is launched 1 or more times after neutral button clicked
+    .setRemindLaunchesNumber(1.toByte())
+    // default is 1, 1 means each launch, 2 means every 2nd launch, 3 means every 3rd launch, etc
+    .setSelectedAppLaunches(4.toByte())
+    // default is true, true means to show the Neutral button ("Remind me later").
+    .setShowLaterButton(true)
+    // default is unlimited, 3 means 3 or less occurrences of the display of the Rate Dialog within a 365-day period
+    .set365DayPeriodMaxNumberDialogLaunchTimes(3.toShort())
+    // default is false, true means to re-enable the Rate Dialog if a new versio[n of app with different version code is installed
+    .setVersionCodeCheck(true)
+    // default is false, true means to re-enable the Rate Dialog if a new version of app with different version name is installed
+    .setVersionNameCheck(true)
+    // default is false, true is for development only, true ensures that the Rate Dialog will be shown each time the app is launched
+    .setDebug(false)
+    .setOnClickButtonListener(object : OnClickButtonListener {
+        override fun onClickButton(which: Byte) {
+            Log.d(TAG, "RateButton: $which")
         }
-        }else{
-        AppRate.showRateDialogIfMeetsConditions(this);     // Shows the Rate Dialog when conditions are met
-        }
-        }
+    })
+    .monitor()
 ```
 
 Default options of the Rate Dialog are as below:
 
 1. Google Play launches when you press the positive button. Change via `AppRate#setStoreType(int)`
-   , `AppRate#setStoreType(int, long)`, `AppRate#setStoreType(String...)`
-   or `AppRate#setStoreType(Intent...)`.
+   , `AppRate#setStoreType(int, long)`, `AppRate#setStoreType(vararg uris: String)`
+   or `AppRate#setStoreType(vararg intents: Intent)`.
+   1. Call this when you want to use the
+[google in-app review API](https://developer.android.com/guide/playcore/in-app-review): `AppRate#useGoogleInAppReview()`
 2. App is launched 10 or more days later than installation. Change
-   via `AppRate#setTimeToWait(long, short)` or `AppRate#setInstallDays(byte)`.
+   via `AppRate#setTimeToWaitAfterInstall(kotlin.time.Duration)`.
 3. App is launched 10 or more times. Change via `AppRate#setLaunchTimes(byte)`.
 4. App is launched 1 or more days after neutral button clicked. Change
-   via `AppRate#setRemindTimeToWait(long, short)` or `AppRate#setRemindInterval(byte)`.
+   via `AppRate#setRemindTimeToWait(kotlin.time.Duration)`.
 5. App is launched 0 or more times after neutral button clicked. Change
    via `AppRate#setRemindLaunchesNumber(byte)`.
 6. Each launch (the condition is satisfied if appLaunches % `param` == 0). Change
@@ -142,20 +153,13 @@ the button of Rate Dialog is pressed.
 `DialogInterface.BUTTON_NEGATIVE` will be passed in the argument of
 `OnClickButtonListener#onClickButton`.
 
-```java
-// Java 7- start
-AppRate.with(this).setOnClickButtonListener(new OnClickButtonListener(){
-@Override
-public void onClickButton(final byte which){
-        // Do something
+```kotlin
+AppRate.with(applicationContext)
+    .setOnClickButtonListener(object : OnClickButtonListener {
+        override fun onClickButton(which: Byte) {
+            Log.d(TAG, "RateButton: $which")
         }
-        })
-// Java 7- end
-// Java 8+ start
-        AppRate.with(this).setOnClickButtonListener(which->{
-        // Do something
-        })
-// Java 8+ end
+    })
 ```
 
 ### Optional custom event requirements
@@ -165,10 +169,10 @@ added/referenced as a unique string. You can set a minimum count for each such e
 action_performed" 3 times,
 "button_clicked" 5 times, etc.)
 
-```java
-AppRate.with(this).setMinimumEventCount(String,short);
-        AppRate.with(this).incrementEventCount(String);
-        AppRate.with(this).setEventCountValue(String,short);
+```kotlin
+AppRate.with(context).setMinimumEventCount(String,short);
+AppRate.with(context).incrementEventCount(String);
+AppRate.with(context).setEventCountValue(String,short);
 ```
 
 ### Clear show dialog flag
@@ -176,8 +180,8 @@ AppRate.with(this).setMinimumEventCount(String,short);
 When you want to show the dialog again, call
 `AppRate#clearAgreeShowDialog()`.
 
-```java
-AppRate.with(this).clearAgreeShowDialog();
+```kotlin
+AppRate.with(context).clearAgreeShowDialog();
 ```
 
 ### Forced display of the Rate Dialog
@@ -185,8 +189,8 @@ AppRate.with(this).clearAgreeShowDialog();
 Use this method directly if you want to force display of the Rate Dialog. Call it when some button
 presses on. Method also useful for testing purposes. Call `AppRate#showRateDialog(Activity)`.
 
-```java
-AppRate.with(this).showRateDialog(this);
+```kotlin
+AppRate.with(context).showRateDialog(activity);
 ```
 
 ### Forced dismiss of the Rate Dialog
@@ -194,26 +198,26 @@ AppRate.with(this).showRateDialog(this);
 Use this method directly if you want to remove the Rate Dialog from the screen.
 Call `AppRate#dismissRateDialog()`.
 
-```java
-AppRate.with(this).dismissRateDialog();
+```kotlin
+AppRate.with(context).dismissRateDialog();
 ```
 
 ### Set custom view
 
 Call `AppRate#setView(View)`.
 
-```java
-LayoutInflater inflater=(LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View view=inflater.inflate(R.layout.custom_dialog,(ViewGroup)findViewById(R.id.layout_root));
-        AppRate.with(this).setView(view);
+```kotlin
+val inflater = context.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+val view: View = inflater.inflate(R.layout.custom_dialog, findViewById<View>(R.id.layout_root) as ViewGroup)
+AppRate.with(this).setView(view)
 ```
 
 ### Specific theme
 
 You can use a specific theme to inflate the dialog.
 
-```java
-AppRate.with(this).setThemeResId(int);
+```kotlin
+AppRate.with(context).setThemeResId(int);
 ```
 
 ### Custom dialog labels
@@ -221,7 +225,6 @@ AppRate.with(this).setThemeResId(int);
 If you want to use your own dialog labels, override string xml resources on your application.
 
 ```xml
-
 <resources>
     <string name="rate_dialog_title">Rate this app</string>
     <string name="rate_dialog_message">If you enjoy playing this app, would you mind taking a moment
@@ -239,31 +242,31 @@ You can use different app stores.
 
 #### Google Play, Amazon Appstore, Cafe Bazaar, Mi Appstore (Xiaomi Market), Samsung Galaxy Apps, SlideME Marketplace, Tencent App Store, Yandex.Store
 
-```java
-AppRate.with(this).setStoreType(StoreType.GOOGLEPLAY); // Google Play
-        AppRate.with(this).setStoreType(StoreType.AMAZON);     // Amazon Appstore
-        AppRate.with(this).setStoreType(StoreType.BAZAAR);     // Cafe Bazaar
-        AppRate.with(this).setStoreType(StoreType.MI);         // Mi Appstore (Xiaomi Market)
-        AppRate.with(this).setStoreType(StoreType.SAMSUNG);    // Samsung Galaxy Apps
-        AppRate.with(this).setStoreType(StoreType.SLIDEME);    // SlideME Marketplace
-        AppRate.with(this).setStoreType(StoreType.TENCENT);    // Tencent App Store
-        AppRate.with(this).setStoreType(StoreType.YANDEX);     // Yandex.Store
+```kotlin
+AppRate.with(context).setStoreType(StoreType.GOOGLEPLAY) // Google Play
+AppRate.with(context).setStoreType(StoreType.AMAZON)     // Amazon Appstore
+AppRate.with(context).setStoreType(StoreType.BAZAAR)     // Cafe Bazaar
+AppRate.with(context).setStoreType(StoreType.MI)         // Mi Appstore (Xiaomi Market)
+AppRate.with(context).setStoreType(StoreType.SAMSUNG)    // Samsung Galaxy Apps
+AppRate.with(context).setStoreType(StoreType.SLIDEME)    // SlideME Marketplace
+AppRate.with(context).setStoreType(StoreType.TENCENT)    // Tencent App Store
+AppRate.with(context).setStoreType(StoreType.YANDEX)     // Yandex.Store
 ```
 
 #### Apple App Store
 
-```java
+```kotlin
 /* Apple App Store, long - your Apple App Store application ID
  * e. g. 284882215 for Facebook (https://itunes.apple.com/app/id284882215) */
-AppRate.with(this).setStoreType(StoreType.APPLE,long);
+AppRate.with(context).setStoreType(StoreType.APPLE,long)
 ```
 
 #### BlackBerry World
 
-```java
+```kotlin
 /* BlackBerry World, long - your BlackBerry World application ID
  * e. g. 50777 for Facebook (https://appworld.blackberry.com/webstore/content/50777) */
-AppRate.with(this).setStoreType(StoreType.BLACKBERRY,long);
+AppRate.with(context).setStoreType(StoreType.BLACKBERRY,long)
 ```
 
 #### Chinese app stores
@@ -271,21 +274,21 @@ AppRate.with(this).setStoreType(StoreType.BLACKBERRY,long);
 The first Chinese app store found on the user device will be used, if first fails, second will be
 used, etc. The Library doesn't check the availability of your application on the app store.
 
-```java
+```kotlin
 /* 19 chinese app stores: 腾讯应用宝, 360手机助手, 小米应用商店, 华为应用商店, 百度手机助手,
  * OPPO应用商店, 中兴应用商店, VIVO应用商店, 豌豆荚, PP手机助手, 安智应用商店, 91手机助手,
  * 应用汇, QQ手机管家, 机锋应用市场, GO市场, 宇龙Coolpad应用商店, 联想应用商店, cool市场 */
-AppRate.with(this).setStoreType(StoreType.CHINESESTORES);
+AppRate.with(context).setStoreType(StoreType.CHINESESTORES)
 ```
 
 #### Other store
 
-```java
+```kotlin
 /* Any other store/stores,
  * String... - an RFC 2396-compliant URI or array of URIs to your app,
  * e. g. "https://otherstore.com/app?id=com.yourapp"
  * or "otherstore://apps/com.yourapp" */
-AppRate.with(this).setStoreType(String...);
+AppRate.with(context).setStoreType(vararg uris: String)
 ```
 
 ### Custom intents
@@ -293,11 +296,11 @@ AppRate.with(this).setStoreType(String...);
 You can set custom action to the Positive button. For example, you want to open your custom
 RateActivity when the Rate button clicked.
 
-```java
+```kotlin
 /* Any custom intent/intents, Intent... - an intent or array of intents,
  * first will be executed (startActivity(intents[0])), if first fails,
  * second will be executed (startActivity(intents[1])), etc. */
-AppRate.with(this).setStoreType(Intent...);
+AppRate.with(context).setStoreType(vararg intent: Intent)
 ```
 
 ### Check for Google Play
@@ -305,20 +308,23 @@ AppRate.with(this).setStoreType(Intent...);
 The following code checks that Google Play is available on the user's device. We recommend to use it
 if current app store type from library options is StoreType.GOOGLEPLAY.
 
-```java
-if(GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)!=ConnectionResult.SERVICE_MISSING){
-        // ...
-        }
+```kotlin
+if (AppRate.with(context).getStoreType() == StoreType.GOOGLEPLAY &&
+    GoogleApiAvailability.getInstance()
+        .isGooglePlayServicesAvailable(context) != ConnectionResult.SERVICE_MISSING
+) {
+    // launch dialog
+}
 ```
 
 ## Sample
 
-Clone this repo and check out the
-[sample](https://gitlab.edyou.eu/Android/AndroidRate/-/tree/master/sample) module.
+Tryout AndroidRate by checking out the
+[sample](https://github.com/stashcat-GmbH/AndroidRate/tree/master/sample) module.
 
 ## Supported Languages
 
-AndroidRate library currently supports the following 41 languages:
+AndroidRate currently supports the following languages:
 
 * Albanian
 * Arabic

@@ -29,6 +29,9 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import java.util.*
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  *
@@ -68,9 +71,9 @@ class AppRate private constructor(context: Context) {
          * @return true if the Rate Dialog is shown, false otherwise
          */
         suspend fun showRateDialogIfMeetsConditions(activity: Activity): Boolean {
-            INSTANCE?.let {
+            with(activity).let {
                 if (it.isDebug || it.shouldShowRateDialog()) {
-                    if(it.storeOptions.storeType == StoreType.GOOGLEPLAY && it.useGoogleInAppReview) {
+                    if (it.storeOptions.storeType == StoreType.GOOGLEPLAY && it.useGoogleInAppReview) {
                         it.launchGoogleInAppReview(activity)
                     } else {
                         it.showRateDialog(activity)
@@ -128,9 +131,9 @@ class AppRate private constructor(context: Context) {
     private var useGoogleInAppReview = false
     private var deferredReviewInfo: Deferred<ReviewInfo?>? = null
     private val reviewManager by lazy { ReviewManagerFactory.create(this@AppRate.context) }
-    private var installDate = Time.DAY * 10L
+    private var installWaitDuration = 10.days
     private var appLaunchTimes = 10.toByte()
-    private var remindInterval = Time.DAY
+    private var remindInterval = 1.days
     private var remindLaunchesNumber = 0.toByte()
     private var selectedAppLaunches = 1.toByte()
 
@@ -202,8 +205,9 @@ class AppRate private constructor(context: Context) {
      * @return the [AppRate] singleton object
      * @see .setTimeToWait
      */
+    @Deprecated("Old TimeUnits are deprecated", ReplaceWith("setTimeToWaitAfterInstall(duration)"))
     fun setInstallDays(installDate: Byte): AppRate = apply {
-        setTimeToWait(Time.DAY, installDate.toShort())
+        setTimeToWaitAfterInstall(installDate.toInt().days)
     }
 
     /**
@@ -219,8 +223,22 @@ class AppRate private constructor(context: Context) {
      * @see .setInstallDays
      * @see Time.TimeUnits
      */
+    @Deprecated("Old TimeUnits are deprecated", ReplaceWith("setTimeToWaitAfterInstall(duration)"))
     fun setTimeToWait(@TimeUnits timeUnit: Long, timeUnitsNumber: Short): AppRate = apply {
-        installDate = timeUnit * timeUnitsNumber
+        installWaitDuration = (timeUnit * timeUnitsNumber).milliseconds
+    }
+
+    /**
+     *
+     * Sets the minimal duration until the Rate Dialog pops up for the first time.
+     *
+     * Default is 10 days, 0 means install millisecond.
+     *
+     * @param waitDuration Duration to wait after install
+     * @return the [AppRate] singleton object
+     */
+    fun setTimeToWaitAfterInstall(waitDuration: Duration): AppRate = apply {
+        installWaitDuration = waitDuration
     }
 
     /**
@@ -233,8 +251,9 @@ class AppRate private constructor(context: Context) {
      * @return the [AppRate] singleton object
      * @see .setRemindTimeToWait
      */
+    @Deprecated("Old TimeUnits are deprecated", ReplaceWith("setRemindTimeToWait(duration)"))
     fun setRemindInterval(remindInterval: Byte): AppRate = apply {
-        setRemindTimeToWait(Time.DAY, remindInterval.toShort())
+        setRemindTimeToWait(remindInterval.toInt().days)
     }
 
     /**
@@ -251,8 +270,26 @@ class AppRate private constructor(context: Context) {
      * @see .setLastTimeShown
      * @see Time.TimeUnits
      */
+    @Deprecated("Old TimeUnits are deprecated", ReplaceWith("setRemindTimeToWait(duration)"))
     fun setRemindTimeToWait(@TimeUnits timeUnit: Long, timeUnitsNumber: Short): AppRate = apply {
-        remindInterval = timeUnit * timeUnitsNumber
+        remindInterval = (timeUnit * timeUnitsNumber).milliseconds
+    }
+
+    /**
+     *
+     * Sets the minimal duration until the Rate Dialog pops up for the next time
+     * after neutral button clicked.
+     *
+     * Default is 1 [day][Time.DAY], 1 means app is launched 1 or more time units after
+     * neutral button clicked.
+     *
+     * @param remindDuration Duration to wait until showing rate dialog again
+     * @return the [AppRate] singleton object
+     * @see .setLastTimeShown
+     * @see kotlin.time.Duration
+     */
+    fun setRemindTimeToWait(remindDuration: Duration): AppRate = apply {
+        remindInterval = remindDuration
     }
 
     /**
@@ -747,14 +784,14 @@ class AppRate private constructor(context: Context) {
     private fun isGoogleInAppReview() =
         useGoogleInAppReview && storeOptions.storeType == StoreType.GOOGLEPLAY
 
-    fun incrementEventCount(eventName: String?): AppRate {
+    fun incrementEventCount(eventName: String): AppRate {
         return setEventCountValue(
             eventName,
             (PreferenceHelper.getCustomEventCount(context, eventName) + 1).toShort()
         )
     }
 
-    fun setEventCountValue(eventName: String?, countValue: Short): AppRate = apply {
+    fun setEventCountValue(eventName: String, countValue: Short): AppRate = apply {
         PreferenceHelper.setCustomEventCount(context, eventName, countValue)
     }
 
@@ -815,6 +852,38 @@ class AppRate private constructor(context: Context) {
     }
 
     /**
+     * Sets a delay, which will block rating dialogs completely, until the delay is over. The delay
+     * is tracked from the moment this function is called (Date().time + [delay]).
+     *
+     * @param delay Duration by which to delay
+     * @return the [AppRate] singleton object
+     */
+    fun setDelay(delay: Duration): AppRate = apply {
+        PreferenceHelper.setDelay(context, delay)
+    }
+
+    /**
+     * Adds a delay duration to the current (already existing) delay. If no delay was previously set,
+     * the delay is calculated from the current time (Date().time + [delay]).
+     *
+     * @param delay Duration by which to delay
+     * @return the [AppRate] singleton object
+     */
+    fun addDelay(delay: Duration): AppRate = apply {
+        PreferenceHelper.addDelay(context, delay)
+    }
+
+    /**
+     * Sets a delay date, rating dialogs will be blocked completely until the delay date is over.
+     *
+     * @param delayDate Until which to delay rating dialogs
+     * @return the [AppRate] singleton object
+     */
+    fun setDelayUntil(delayDate: Date): AppRate = apply {
+        PreferenceHelper.setDelayUntil(context, delayDate)
+    }
+
+    /**
      *
      * Monitors launches of the application.
      *
@@ -843,7 +912,7 @@ class AppRate private constructor(context: Context) {
             }
         }
 
-        if(isGoogleInAppReview() && (shouldShowRateDialog() || isDebug)) {
+        if (isGoogleInAppReview() && (shouldShowRateDialog() || isDebug)) {
             // pre-caching ReviewInfo
             Log.d(TAG, "Google in-app Review: Pre-caching ReviewInfo object")
             deferredReviewInfo = createReviewInfoAsync()
@@ -974,11 +1043,12 @@ class AppRate private constructor(context: Context) {
                 isOverRemindDate() &&
                 isOverRemindLaunchesNumber() &&
                 isOverCustomEventsRequirements() &&
-                isBelow365DayPeriodMaxNumberDialogLaunchTimes()
+                isBelow365DayPeriodMaxNumberDialogLaunchTimes() &&
+                isOverDelay()
     }
 
-    private fun isOverDate(targetDate: Long, threshold: Long): Boolean {
-        return Date().time - targetDate >= threshold
+    private fun isOverDate(targetDate: Long, threshold: Duration): Boolean {
+        return Date().time - targetDate >= threshold.inWholeMilliseconds
     }
 
     private fun isOverLaunchTimes(): Boolean =
@@ -987,12 +1057,13 @@ class AppRate private constructor(context: Context) {
     private fun isSelectedAppLaunch(): Boolean = selectedAppLaunches.toInt() == 1 ||
             selectedAppLaunches.toInt() != 0 && PreferenceHelper.getLaunchTimes(context) % selectedAppLaunches == 0
 
-    private fun isOverInstallDate(): Boolean = installDate == 0L || isOverDate(
-        PreferenceHelper.getInstallDate(context),
-        installDate
-    )
+    private fun isOverInstallDate(): Boolean =
+        installWaitDuration.inWholeMilliseconds == 0L || isOverDate(
+            PreferenceHelper.getInstallDate(context),
+            installWaitDuration
+        )
 
-    private fun isOverRemindDate(): Boolean = remindInterval == 0L ||
+    private fun isOverRemindDate(): Boolean = remindInterval.inWholeMilliseconds == 0L ||
             PreferenceHelper.getLastTimeShown(context) == 0L ||
             isOverDate(PreferenceHelper.getLastTimeShown(context), remindInterval)
 
@@ -1020,6 +1091,8 @@ class AppRate private constructor(context: Context) {
         // if null, all custom events have counts bigger than or are equal to the expected values
         return unmetCustomEvents == null
     }
+
+    private fun isOverDelay() = Date().time > PreferenceHelper.getDelay(context)
 
     /**
      *
@@ -1054,11 +1127,14 @@ class AppRate private constructor(context: Context) {
             } else {
                 val errorCode = (task.exception as? ReviewException)?.errorCode ?: 9999
                 Log.d(TAG, "Google in-app Review: ReviewInfo couldn't be retrieved.")
-                Log.d(TAG,"\t\tError Code: $errorCode (9999 means the error code couldn't be determined).")
+                Log.d(
+                    TAG,
+                    "\t\tError Code: $errorCode (9999 means the error code couldn't be determined)."
+                )
                 Log.d(
                     TAG,
                     "\t\tVisit https://developers.google.com/android/reference/com/google/android/gms/common/api/CommonStatusCodes " +
-                        "for more details."
+                            "for more details."
                 )
                 null
             }
