@@ -19,6 +19,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.compileSdkVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     compileOptions {
         sourceCompatibility javaVersion
@@ -52,11 +53,15 @@ android {
     namespace 'com.vorlonsoft.android.rate'
 }
 dependencies {
-    compileOnly "androidx.annotation:annotation:${androidx.annotation}"
-    api "androidx.appcompat:appcompat:${androidx.appcompat}"
+
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:${testLibs.mockitoKotlin}"
+    androidTestImplementation "org.mockito:mockito-android:${testLibs.mockitoAndroid}"
+    androidTestImplementation "androidx.test:core:${androidxTest.core}"
     androidTestImplementation "androidx.test:runner:${androidxTest.runner}"
+
+    api "androidx.appcompat:appcompat:${androidx.appcompat}"
+
     // Kotlin
-    implementation "androidx.core:core-ktx:${ktx.core}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${ktx.coroutines}"
     implementation "com.google.android.play:review:${google.review}"
 }
