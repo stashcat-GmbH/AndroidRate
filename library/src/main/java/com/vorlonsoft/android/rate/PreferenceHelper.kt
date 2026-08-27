@@ -5,9 +5,9 @@
  */
 package com.vorlonsoft.android.rate
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.vorlonsoft.android.rate.AppInformation.getLongVersionCode
 import com.vorlonsoft.android.rate.Constants.Date.YEAR_IN_DAYS
 import com.vorlonsoft.android.rate.Constants.Utils.EMPTY_STRING
@@ -25,39 +25,61 @@ import kotlin.time.Duration
  * @author   Alexander Savin
  * @author   Shintaro Katafuchi
  */
-internal object PreferenceHelper {
+class PreferenceHelper @JvmOverloads constructor(context: Context, prefsProvider: PreferencesProvider = defaultPreferencesProvider) {
 
-    private const val PREF_FILE_NAME = "androidrate_pref_file"
-    private const val PREF_KEY_365_DAY_PERIOD_DIALOG_LAUNCH_TIMES =
-        "androidrate_365_day_period_dialog_launch_times"
+    private val prefs = prefsProvider.getSharedPreferences(context, PREF_FILE_NAME, Context.MODE_PRIVATE)
 
-    /** The key prefix for each custom event, so that there is no clash with existing keys (PREF_KEY_INSTALL_DATE etc.)  */
-    private const val PREF_KEY_CUSTOM_EVENT_PREFIX = "androidrate_custom_event_prefix_"
-    private const val PREF_KEY_DIALOG_FIRST_LAUNCH_TIME = "androidrate_dialog_first_launch_time"
-    private const val PREF_KEY_INSTALL_DATE = "androidrate_install_date"
-    private const val PREF_KEY_AGREED_OR_DECLINED = "androidrate_is_agree_show_dialog"
-    private const val PREF_KEY_LAUNCH_TIMES = "androidrate_launch_times"
-    private const val PREF_KEY_LAST_TIME_SHOWN = "androidrate_remind_interval"
-    private const val PREF_KEY_REMIND_LAUNCHES_NUMBER = "androidrate_remind_launches_number"
-    private const val PREF_KEY_DELAY_DATE = "androidrate_delay_date"
-    private const val PREF_KEY_VERSION_CODE = "androidrate_version_code"
-    private const val PREF_KEY_VERSION_NAME = "androidrate_version_name"
-    private const val NUMERIC_MASK = "(0|[1-9]\\d*)"
-    private const val DEFAULT_DIALOG_LAUNCH_TIMES = ":0y0-0:"
-    private const val CURRENT_DAY_LAUNCHES_MASK = "-$NUMERIC_MASK:"
+    interface PreferencesProvider {
+        fun getSharedPreferences(context: Context, name: String, mode: Int): SharedPreferences
+    }
 
-    private const val UNSET_DELAY_DATE = -1L
+    companion object {
+        val defaultPreferencesProvider =
+            object : PreferencesProvider {
+                override fun getSharedPreferences(
+                    context: Context,
+                    name: String,
+                    mode: Int
+                ): SharedPreferences = context.getSharedPreferences(name, mode)
+            }
 
-    private fun Context.getPreferences() =
-        getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
+        private const val PREF_FILE_NAME = "androidrate_pref_file"
+        internal const val PREF_KEY_365_DAY_PERIOD_DIALOG_LAUNCH_TIMES =
+            "androidrate_365_day_period_dialog_launch_times"
 
-    private fun Context.editPrefs(
+        /** The key prefix for each custom event, so that there is no clash with existing keys (PREF_KEY_INSTALL_DATE etc.)  */
+        internal const val PREF_KEY_CUSTOM_EVENT_PREFIX = "androidrate_custom_event_prefix_"
+        internal const val PREF_KEY_DIALOG_FIRST_LAUNCH_TIME = "androidrate_dialog_first_launch_time"
+        internal const val PREF_KEY_INSTALL_DATE = "androidrate_install_date"
+        internal const val PREF_KEY_AGREED_OR_DECLINED = "androidrate_is_agree_show_dialog"
+        internal const val PREF_KEY_LAUNCH_TIMES = "androidrate_launch_times"
+        internal const val PREF_KEY_LAST_TIME_SHOWN = "androidrate_remind_interval"
+        internal const val PREF_KEY_REMIND_LAUNCHES_NUMBER = "androidrate_remind_launches_number"
+        internal const val PREF_KEY_DELAY_DATE = "androidrate_delay_date"
+        private const val PREF_KEY_VERSION_CODE = "androidrate_version_code"
+        private const val PREF_KEY_VERSION_NAME = "androidrate_version_name"
+        private const val NUMERIC_MASK = "(0|[1-9]\\d*)"
+        internal const val DEFAULT_DIALOG_LAUNCH_TIMES = ":0y0-0:"
+        private const val CURRENT_DAY_LAUNCHES_MASK = "-$NUMERIC_MASK:"
+
+        internal const val UNSET_DELAY_DATE = -1L
+    }
+
+    @SuppressLint("ApplySharedPref")
+    inline fun SharedPreferences.edit(
         commit: Boolean = false,
-        editAction: SharedPreferences.Editor.() -> Unit
-    ) = getPreferences().edit(commit) { editAction() }
+        action: SharedPreferences.Editor.() -> Unit
+    ) {
+        val editor = edit()
+        action(editor)
+        if (commit) {
+            editor.commit()
+        } else {
+            editor.apply()
+        }
+    }
 
     private fun setCurrentDayDialogLaunchTimes(
-        context: Context,
         dialogLaunchTimes: String?,
         currentYear: Byte,
         currentDay: Short,
@@ -80,7 +102,8 @@ internal object PreferenceHelper {
                         .replaceAll(":")
             }
         }
-        context.editPrefs {
+
+        prefs.edit {
             putString(PREF_KEY_365_DAY_PERIOD_DIALOG_LAUNCH_TIMES, putDialogLaunchTimes)
         }
     }
@@ -91,16 +114,13 @@ internal object PreferenceHelper {
      *
      * @param context context
      */
-    @JvmStatic
-    fun clearSharedPreferences(context: Context) = context.editPrefs { clear() }
+    fun clearSharedPreferences() = prefs.edit{ clear() }
 
-    @JvmStatic
-    fun isFirstLaunch(context: Context): Boolean =
-        context.getPreferences().getLong(PREF_KEY_INSTALL_DATE, 0L) == 0L
+    fun isFirstLaunch(): Boolean =
+        prefs.getLong(PREF_KEY_INSTALL_DATE, 0L) == 0L
 
-    @JvmStatic
     fun setFirstLaunchSharedPreferences(context: Context) {
-        context.editPrefs {
+        prefs.edit {
             putString(
                 PREF_KEY_365_DAY_PERIOD_DIALOG_LAUNCH_TIMES,
                 DEFAULT_DIALOG_LAUNCH_TIMES
@@ -114,17 +134,16 @@ internal object PreferenceHelper {
             putString(PREF_KEY_VERSION_NAME, AppInformation.getVersionName(context))
         }
 
-        if (!getAgreedOrDeclined(context)) { //if (get() == false) set(false); - NOT error!
-            setAgreedOrDeclined(context, false)
+        if (!getAgreedOrDeclined()) { //if (get() == false) set(false); - NOT error!
+            setAgreedOrDeclined(false)
         }
     }
 
-    @JvmStatic
-    fun increment365DayPeriodDialogLaunchTimes(context: Context) {
+    fun increment365DayPeriodDialogLaunchTimes() {
         var currentDay =
-            ((Date().time - getDialogFirstLaunchTime(context)) / Time.DAY).toShort()
+            ((Date().time - getDialogFirstLaunchTime()) / Time.DAY).toShort()
         val currentYear: Byte = (currentDay / YEAR_IN_DAYS).toByte()
-        val currentDialogLaunchTimes = context.getPreferences()
+        val currentDialogLaunchTimes = prefs
             .getString(PREF_KEY_365_DAY_PERIOD_DIALOG_LAUNCH_TIMES, DEFAULT_DIALOG_LAUNCH_TIMES)
         if (currentYear > 0) {
             currentDay = (currentDay % YEAR_IN_DAYS).toShort()
@@ -146,23 +165,22 @@ internal object PreferenceHelper {
                 }
             }
             setCurrentDayDialogLaunchTimes(
-                context, currentDialogLaunchTimes, currentYear,
+                currentDialogLaunchTimes, currentYear,
                 currentDay, (currentDayCount.toShort() + 1).toShort()
             )
         } else {
             setCurrentDayDialogLaunchTimes(
-                context, currentDialogLaunchTimes, currentYear,
+                currentDialogLaunchTimes, currentYear,
                 currentDay, 1.toShort()
             )
         }
     }
 
-    @JvmStatic
-    fun get365DayPeriodDialogLaunchTimes(context: Context): Short {
+    fun get365DayPeriodDialogLaunchTimes(): Short {
         var currentDay =
-            ((Date().time - getDialogFirstLaunchTime(context)) / Time.DAY).toShort()
+            ((Date().time - getDialogFirstLaunchTime()) / Time.DAY).toShort()
         val currentYear: Byte = (currentDay / YEAR_IN_DAYS).toByte()
-        var dialogLaunchTimes = context.getPreferences()
+        var dialogLaunchTimes = prefs
             .getString(PREF_KEY_365_DAY_PERIOD_DIALOG_LAUNCH_TIMES, DEFAULT_DIALOG_LAUNCH_TIMES)
             ?.let {
                 Pattern.compile(":${NUMERIC_MASK}y${currentYear}-")
@@ -197,25 +215,20 @@ internal object PreferenceHelper {
         return dialogLaunchTimesCount
     }
 
-    @JvmStatic
-    fun setCustomEventCount(context: Context, eventName: String, eventCount: Short) =
-        context.editPrefs { putInt(PREF_KEY_CUSTOM_EVENT_PREFIX + eventName, eventCount.toInt()) }
+    fun setCustomEventCount(eventName: String, eventCount: Short) =
+        prefs.edit { putInt(PREF_KEY_CUSTOM_EVENT_PREFIX + eventName, eventCount.toInt()) }
 
-    @JvmStatic
-    fun getCustomEventCount(context: Context, eventName: String): Short =
-        context.getPreferences().getInt(PREF_KEY_CUSTOM_EVENT_PREFIX + eventName, 0).toShort()
+    fun getCustomEventCount(eventName: String): Short =
+        prefs.getInt(PREF_KEY_CUSTOM_EVENT_PREFIX + eventName, 0).toShort()
 
-    @JvmStatic
-    fun setDialogFirstLaunchTime(context: Context) =
-        context.editPrefs { putLong(PREF_KEY_DIALOG_FIRST_LAUNCH_TIME, Date().time) }
+    fun setDialogFirstLaunchTime() =
+        prefs.edit { putLong(PREF_KEY_DIALOG_FIRST_LAUNCH_TIME, Date().time) }
 
-    @JvmStatic
-    fun getDialogFirstLaunchTime(context: Context): Long =
-        context.getPreferences().getLong(PREF_KEY_DIALOG_FIRST_LAUNCH_TIME, 0L)
+    fun getDialogFirstLaunchTime(): Long =
+        prefs.getLong(PREF_KEY_DIALOG_FIRST_LAUNCH_TIME, 0L)
 
-    @JvmStatic
-    fun getInstallDate(context: Context): Long =
-        context.getPreferences().getLong(PREF_KEY_INSTALL_DATE, 0L)
+    fun getInstallDate(): Long =
+        prefs.getLong(PREF_KEY_INSTALL_DATE, 0L)
 
     /**
      *
@@ -224,39 +237,31 @@ internal object PreferenceHelper {
      * If true, the user has either agreed or declined to rating the app.
      * Meaning the rating dialog shouldn't be shown again.
      *
-     * @param context context
      * @param agreedOrDeclined the Rate Dialog agree flag
      */
-    @JvmStatic
-    fun setAgreedOrDeclined(context: Context, agreedOrDeclined: Boolean) =
-        context.editPrefs { putBoolean(PREF_KEY_AGREED_OR_DECLINED, agreedOrDeclined) }
+    fun setAgreedOrDeclined(agreedOrDeclined: Boolean) =
+        prefs.edit { putBoolean(PREF_KEY_AGREED_OR_DECLINED, agreedOrDeclined) }
 
-    @JvmStatic
-    fun getAgreedOrDeclined(context: Context): Boolean =
-        context.getPreferences().getBoolean(PREF_KEY_AGREED_OR_DECLINED, false)
+    fun getAgreedOrDeclined(): Boolean =
+        prefs.getBoolean(PREF_KEY_AGREED_OR_DECLINED, false)
 
     /**
      *
      * Sets number of times the app has been launched.
      *
-     * @param context context
      * @param launchTimes number of launch times to set
      */
-    @JvmStatic
-    fun setLaunchTimes(context: Context, launchTimes: Short) =
-        context.editPrefs { putInt(PREF_KEY_LAUNCH_TIMES, launchTimes.toInt()) }
+    fun setLaunchTimes(launchTimes: Short) =
+        prefs.edit { putInt(PREF_KEY_LAUNCH_TIMES, launchTimes.toInt()) }
 
-    @JvmStatic
-    fun getLaunchTimes(context: Context): Short =
-        context.getPreferences().getInt(PREF_KEY_LAUNCH_TIMES, 0).toShort()
+    fun getLaunchTimes(): Short =
+        prefs.getInt(PREF_KEY_LAUNCH_TIMES, 0).toShort()
 
-    @JvmStatic
-    fun setLastTimeShown(context: Context) =
-        context.editPrefs { putLong(PREF_KEY_LAST_TIME_SHOWN, Date().time) }
+    fun setLastTimeShown() =
+        prefs.edit{ putLong(PREF_KEY_LAST_TIME_SHOWN, Date().time) }
 
-    @JvmStatic
-    fun getLastTimeShown(context: Context): Long =
-        context.getPreferences().getLong(PREF_KEY_LAST_TIME_SHOWN, 0L)
+    fun getLastTimeShown(): Long =
+        prefs.getLong(PREF_KEY_LAST_TIME_SHOWN, 0L)
 
     /**
      *
@@ -264,91 +269,76 @@ internal object PreferenceHelper {
      *
      * The Library calls this method when the neutral button is clicked.
      *
-     * @param context context
      */
-    @JvmStatic
-    fun setRemindLaunchesNumber(context: Context) =
-        context.editPrefs {
+    fun setRemindLaunchesNumber() =
+        prefs.edit {
             putInt(
                 PREF_KEY_REMIND_LAUNCHES_NUMBER,
-                getLaunchTimes(context).toInt()
+                getLaunchTimes().toInt()
             )
         }
 
-    @JvmStatic
-    fun getRemindLaunchesNumber(context: Context): Short =
-        context.getPreferences().getInt(PREF_KEY_REMIND_LAUNCHES_NUMBER, 0).toShort()
+    fun getRemindLaunchesNumber(): Short =
+        prefs.getInt(PREF_KEY_REMIND_LAUNCHES_NUMBER, 0).toShort()
 
     /**
      *
      * Clears shared preferences that were set up by clicking the Remind Button.
      *
-     * @param context context
      */
-    @JvmStatic
-    fun clearRemindButtonClick(context: Context) =
-        context.editPrefs {
+    fun clearRemindButtonClick() =
+        prefs.edit {
             putLong(PREF_KEY_LAST_TIME_SHOWN, 0L)
             putInt(PREF_KEY_REMIND_LAUNCHES_NUMBER, 0)
         }
 
-    @JvmStatic
     fun setVersionCode(context: Context) =
-        context.editPrefs { putLong(PREF_KEY_VERSION_CODE, getLongVersionCode(context)) }
+        prefs.edit { putLong(PREF_KEY_VERSION_CODE, getLongVersionCode(context)) }
 
-    @JvmStatic
-    fun getVersionCode(context: Context): Long =
-        context.getPreferences().getLong(PREF_KEY_VERSION_CODE, 0L)
+    fun getVersionCode(): Long =
+        prefs.getLong(PREF_KEY_VERSION_CODE, 0L)
 
-    @JvmStatic
     fun setVersionName(context: Context) =
-        context.editPrefs {
+        prefs.edit {
             putString(
                 PREF_KEY_VERSION_NAME,
                 AppInformation.getVersionName(context)
             )
         }
 
-    @JvmStatic
-    fun getVersionName(context: Context): String? =
-        context.getPreferences().getString(PREF_KEY_VERSION_NAME, EMPTY_STRING)
+    fun getVersionName(): String? =
+        prefs.getString(PREF_KEY_VERSION_NAME, EMPTY_STRING)
 
-    @JvmStatic
-    fun dialogShown(context: Context) {
-        if (getDialogFirstLaunchTime(context) == 0L) {
-            setDialogFirstLaunchTime(context)
+    fun dialogShown() {
+        if (getDialogFirstLaunchTime() == 0L) {
+            setDialogFirstLaunchTime()
         }
-        increment365DayPeriodDialogLaunchTimes(context)
+        increment365DayPeriodDialogLaunchTimes()
     }
 
-    @JvmStatic
-    fun setReminderToShowAgain(context: Context) {
-        setLastTimeShown(context)
-        setRemindLaunchesNumber(context)
+    fun setReminderToShowAgain() {
+        setLastTimeShown()
+        setRemindLaunchesNumber()
     }
 
-    @JvmStatic
-    fun getDelay(context: Context): Long =
-        context.getPreferences().getLong(PREF_KEY_DELAY_DATE, UNSET_DELAY_DATE)
+    fun getDelay(): Long =
+        prefs.getLong(PREF_KEY_DELAY_DATE, UNSET_DELAY_DATE)
 
-    @JvmStatic
-    fun setDelay(context: Context, delay: Duration) =
-        context.editPrefs {
+    fun setDelay(delay: Duration) =
+        prefs.edit {
             putLong(PREF_KEY_DELAY_DATE, Date().time + delay.inWholeMilliseconds)
         }
 
-    @JvmStatic
-    fun setDelayUntil(context: Context, date: Date) =
-        context.editPrefs { putLong(PREF_KEY_DELAY_DATE, date.time) }
+    fun setDelayUntil(date: Date) =
+        prefs.edit { putLong(PREF_KEY_DELAY_DATE, date.time) }
 
-    @JvmStatic
-    fun addDelay(context: Context, delay: Duration) {
+    fun addDelay(delay: Duration) {
         var currentDelay: Long =
-            context.getPreferences().getLong(PREF_KEY_DELAY_DATE, UNSET_DELAY_DATE)
+            prefs.getLong(PREF_KEY_DELAY_DATE, UNSET_DELAY_DATE)
         if (currentDelay == UNSET_DELAY_DATE) {
             currentDelay = Date().time
         }
-        context.editPrefs {
+        prefs.edit {
             putLong(PREF_KEY_DELAY_DATE, currentDelay + delay.inWholeMilliseconds)
         }
     }

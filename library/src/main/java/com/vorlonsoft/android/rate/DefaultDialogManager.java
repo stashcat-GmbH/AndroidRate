@@ -17,7 +17,6 @@ import static android.view.View.VISIBLE;
 import static android.widget.LinearLayout.VERTICAL;
 import static com.vorlonsoft.android.rate.Constants.Utils.TAG;
 import static com.vorlonsoft.android.rate.DialogType.CLASSIC;
-import static com.vorlonsoft.android.rate.PreferenceHelper.dialogShown;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -81,7 +80,7 @@ public class DefaultDialogManager implements DialogManager {
                     }
                 }
             } else {
-                dialogShown(context);
+                new PreferenceHelper(context).dialogShown();
             }
             if (((SDK_INT >= LOLLIPOP) || (dialog instanceof androidx.appcompat.app.AlertDialog)) &&
                 ((dialogOptions.getType() == CLASSIC) ||

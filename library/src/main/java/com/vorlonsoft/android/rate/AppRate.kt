@@ -114,6 +114,8 @@ class AppRate private constructor(context: Context) {
         this.context = context.applicationContext
     }
 
+    private val prefsHelper = PreferenceHelper(context)
+
     private val dialogOptions = DialogOptions()
     private val storeOptions = StoreOptions()
 
@@ -312,7 +314,7 @@ class AppRate private constructor(context: Context) {
      * @return the [AppRate] singleton object
      */
     fun clearRemindButtonClick(): AppRate = apply {
-        PreferenceHelper.clearRemindButtonClick(context)
+        prefsHelper.clearRemindButtonClick()
     }
 
     fun setMinimumEventCount(eventName: String, minimumCount: Short): AppRate = apply {
@@ -422,7 +424,7 @@ class AppRate private constructor(context: Context) {
     }
 
     fun clearSettingsParam(): AppRate = apply {
-        PreferenceHelper.clearSharedPreferences(context)
+        prefsHelper.clearSharedPreferences()
     }
 
     /**
@@ -438,7 +440,7 @@ class AppRate private constructor(context: Context) {
     /**
      * @return true if the rating dialog has been agreed to or declined.
      */
-    fun getAgreedOrDeclinedDialog(): Boolean = PreferenceHelper.getAgreedOrDeclined(context)
+    fun getAgreedOrDeclinedDialog(): Boolean = prefsHelper.getAgreedOrDeclined()
 
     /**
      *
@@ -449,7 +451,7 @@ class AppRate private constructor(context: Context) {
      * @return the [AppRate] singleton object
      */
     fun setAgreedOrDeclinedDialog(agreedOrDeclined: Boolean): AppRate = apply {
-        PreferenceHelper.setAgreedOrDeclined(context, agreedOrDeclined)
+        prefsHelper.setAgreedOrDeclined(agreedOrDeclined)
     }
 
     fun setView(view: View?): AppRate = apply {
@@ -787,12 +789,12 @@ class AppRate private constructor(context: Context) {
     fun incrementEventCount(eventName: String): AppRate {
         return setEventCountValue(
             eventName,
-            (PreferenceHelper.getCustomEventCount(context, eventName) + 1).toShort()
+            (prefsHelper.getCustomEventCount(eventName) + 1).toShort()
         )
     }
 
     fun setEventCountValue(eventName: String, countValue: Short): AppRate = apply {
-        PreferenceHelper.setCustomEventCount(context, eventName, countValue)
+        prefsHelper.setCustomEventCount(eventName, countValue)
     }
 
     /**
@@ -859,7 +861,7 @@ class AppRate private constructor(context: Context) {
      * @return the [AppRate] singleton object
      */
     fun setDelay(delay: Duration): AppRate = apply {
-        PreferenceHelper.setDelay(context, delay)
+        prefsHelper.setDelay(delay)
     }
 
     /**
@@ -870,7 +872,7 @@ class AppRate private constructor(context: Context) {
      * @return the [AppRate] singleton object
      */
     fun addDelay(delay: Duration): AppRate = apply {
-        PreferenceHelper.addDelay(context, delay)
+        prefsHelper.addDelay(delay)
     }
 
     /**
@@ -880,7 +882,7 @@ class AppRate private constructor(context: Context) {
      * @return the [AppRate] singleton object
      */
     fun setDelayUntil(delayDate: Date): AppRate = apply {
-        PreferenceHelper.setDelayUntil(context, delayDate)
+        prefsHelper.setDelayUntil(delayDate)
     }
 
     /**
@@ -891,24 +893,23 @@ class AppRate private constructor(context: Context) {
      * is called.
      */
     fun monitor() {
-        if (PreferenceHelper.isFirstLaunch(context)) {
-            PreferenceHelper.setFirstLaunchSharedPreferences(context)
+        if (prefsHelper.isFirstLaunch()) {
+            prefsHelper.setFirstLaunchSharedPreferences(context)
         } else {
-            PreferenceHelper.setLaunchTimes(
-                context,
-                (PreferenceHelper.getLaunchTimes(context) + 1).toShort()
+            prefsHelper.setLaunchTimes(
+                (prefsHelper.getLaunchTimes() + 1).toShort()
             )
-            if (getLongVersionCode(context) != PreferenceHelper.getVersionCode(context)) {
+            if (getLongVersionCode(context) != prefsHelper.getVersionCode()) {
                 if (isVersionCodeCheck) {
                     setAgreedOrDeclinedDialog(false)
                 }
-                PreferenceHelper.setVersionCode(context)
+                prefsHelper.setVersionCode(context)
             }
-            if (getVersionName(context) != PreferenceHelper.getVersionName(context)) {
+            if (getVersionName(context) != prefsHelper.getVersionName()) {
                 if (isVersionNameCheck) {
                     setAgreedOrDeclinedDialog(false)
                 }
-                PreferenceHelper.setVersionName(context)
+                prefsHelper.setVersionName(context)
             }
         }
 
@@ -1052,30 +1053,28 @@ class AppRate private constructor(context: Context) {
     }
 
     private fun isOverLaunchTimes(): Boolean =
-        appLaunchTimes.toInt() == 0 || PreferenceHelper.getLaunchTimes(context) >= appLaunchTimes
+        appLaunchTimes.toInt() == 0 || prefsHelper.getLaunchTimes() >= appLaunchTimes
 
     private fun isSelectedAppLaunch(): Boolean = selectedAppLaunches.toInt() == 1 ||
-            selectedAppLaunches.toInt() != 0 && PreferenceHelper.getLaunchTimes(context) % selectedAppLaunches == 0
+            selectedAppLaunches.toInt() != 0 && prefsHelper.getLaunchTimes() % selectedAppLaunches == 0
 
     private fun isOverInstallDate(): Boolean =
         installWaitDuration.inWholeMilliseconds == 0L || isOverDate(
-            PreferenceHelper.getInstallDate(context),
+            prefsHelper.getInstallDate(),
             installWaitDuration
         )
 
     private fun isOverRemindDate(): Boolean = remindInterval.inWholeMilliseconds == 0L ||
-            PreferenceHelper.getLastTimeShown(context) == 0L ||
-            isOverDate(PreferenceHelper.getLastTimeShown(context), remindInterval)
+            prefsHelper.getLastTimeShown() == 0L ||
+            isOverDate(prefsHelper.getLastTimeShown(), remindInterval)
 
     private fun isOverRemindLaunchesNumber(): Boolean = remindLaunchesNumber.toInt() == 0 ||
-            PreferenceHelper.getRemindLaunchesNumber(context).toInt() == 0 ||
-            PreferenceHelper.getLaunchTimes(context) - PreferenceHelper.getRemindLaunchesNumber(
-        context
-    ) >= remindLaunchesNumber
+            prefsHelper.getRemindLaunchesNumber().toInt() == 0 ||
+            prefsHelper.getLaunchTimes() - prefsHelper.getRemindLaunchesNumber() >= remindLaunchesNumber
 
     private fun isBelow365DayPeriodMaxNumberDialogLaunchTimes(): Boolean =
         dialogLaunchTimes == Short.MAX_VALUE ||
-                PreferenceHelper.get365DayPeriodDialogLaunchTimes(context) < dialogLaunchTimes
+                prefsHelper.get365DayPeriodDialogLaunchTimes() < dialogLaunchTimes
 
     private fun isOverCustomEventsRequirements(): Boolean {
         if (customEventsCounts.isEmpty()) {
@@ -1083,8 +1082,7 @@ class AppRate private constructor(context: Context) {
         }
         // checking if at least one custom event count is below the expected value
         val unmetCustomEvents = customEventsCounts.entries.firstOrNull {
-            PreferenceHelper.getCustomEventCount(
-                context,
+            prefsHelper.getCustomEventCount(
                 it.key
             ) < it.value
         }
@@ -1092,7 +1090,7 @@ class AppRate private constructor(context: Context) {
         return unmetCustomEvents == null
     }
 
-    private fun isOverDelay() = Date().time > PreferenceHelper.getDelay(context)
+    private fun isOverDelay() = Date().time > prefsHelper.getDelay()
 
     /**
      *
@@ -1160,9 +1158,9 @@ class AppRate private constructor(context: Context) {
             Log.d(TAG, "Google in-app review: flow finished")
             deferredReviewInfo = null
             // updating launch times of dialog
-            PreferenceHelper.dialogShown(context)
+            prefsHelper.dialogShown()
             // we don't know what the user did, always set remind values for next dialog launch
-            PreferenceHelper.setReminderToShowAgain(context)
+            prefsHelper.setReminderToShowAgain()
         }
     }
 }
