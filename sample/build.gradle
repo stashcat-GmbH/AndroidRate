@@ -1,8 +1,4 @@
-/*
- * Copyright 2017 - 2018 Vorlonsoft LLC
- *
- * Licensed under The MIT License (MIT)
- */
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias libs.plugins.android.application
@@ -10,7 +6,7 @@ plugins {
 }
 
 android {
-    compileSdk rootProject.ext.androidCompileSdk
+    compileSdk = rootProject.ext.androidCompileSdk
 
     defaultConfig {
         applicationId 'com.vorlonsoft.android.rate.sample'
@@ -23,10 +19,6 @@ android {
     compileOptions {
         sourceCompatibility rootProject.ext.javaCompatibility
         targetCompatibility rootProject.ext.javaCompatibility
-    }
-
-    kotlinOptions {
-        jvmTarget = rootProject.ext.javaCompatibility.toString()
     }
 
     bundle {
@@ -42,15 +34,8 @@ android {
     }
 
     buildTypes {
-        configureEach {
-            jniDebuggable false
-            renderscriptDebuggable false
-            renderscriptOptimLevel 3
-            embedMicroApp false
-        }
         release {
             applicationIdSuffix ''
-            zipAlignEnabled true
             debuggable false
             postprocessing {
                 removeUnusedCode true
@@ -62,7 +47,6 @@ android {
         }
         debug {
             applicationIdSuffix '.debug'
-            zipAlignEnabled false
             debuggable true
             postprocessing {
                 removeUnusedCode false
@@ -74,12 +58,19 @@ android {
         }
     }
     namespace 'com.vorlonsoft.android.rate.sample'
-    applicationVariants.all { variant ->
-        variant.outputs.all {
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach {
             outputFileName = "${variant.name}-${variant.versionName}.apk"
         }
     }
 }
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
+    }
+}
+
 
 dependencies {
     implementation project(':library')

@@ -1,8 +1,4 @@
-/*
- * Copyright 2017 - 2018 Vorlonsoft LLC
- *
- * Licensed under The MIT License (MIT)
- */
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias libs.plugins.android.library
@@ -10,22 +6,17 @@ plugins {
 }
 
 android {
-    compileSdk rootProject.ext.androidCompileSdk
+    compileSdk = rootProject.ext.androidCompileSdk
 
     defaultConfig {
         minSdkVersion rootProject.ext.androidMinSdk
         targetSdkVersion rootProject.ext.androidCompileSdk
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
     }
 
     compileOptions {
         sourceCompatibility rootProject.ext.javaCompatibility
         targetCompatibility rootProject.ext.javaCompatibility
-    }
-
-    kotlinOptions {
-        jvmTarget = rootProject.ext.javaCompatibility.toString()
     }
 
     buildTypes {
@@ -51,6 +42,12 @@ android {
         }
     }
     namespace 'com.vorlonsoft.android.rate'
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
+    }
 }
 
 dependencies {

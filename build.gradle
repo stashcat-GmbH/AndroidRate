@@ -14,10 +14,10 @@ plugins {
 ext {
     appVersionCode = 60
 
-    androidMinSdk = 20
-    androidCompileSdk = 31
+    androidMinSdk = 26
+    androidCompileSdk = 36
 
-    javaCompatibility = JavaVersion.VERSION_1_8
+    javaCompatibility = JavaVersion.VERSION_11
 }
 
 allprojects {

@@ -1,22 +1,22 @@
 [versions]
-kotlin = "1.7.20"
-android_build = "7.3.1"
+kotlin = "2.4.10"
+android_build = "8.13.2"
 
-androidx_appcompat = "1.4.2" # https://developer.android.com/jetpack/androidx/releases/appcompat
-androidx_constraintlayout = "2.1.4" # https://developer.android.com/jetpack/androidx/releases/appcompat
-androidx_lifecycle = "2.5.1" # https://developer.android.com/jetpack/androidx/releases/lifecycle
+androidx_appcompat = "1.8.0" # https://developer.android.com/jetpack/androidx/releases/appcompat
+androidx_constraintlayout = "2.2.2" # https://developer.android.com/jetpack/androidx/releases/appcompat
+androidx_lifecycle = "2.11.0" # https://developer.android.com/jetpack/androidx/releases/lifecycle
 
-androidx_test_runner = "1.5.2"
-androidx_test_core = "1.5.0"
+androidx_test_runner = "1.7.0"
+androidx_test_core = "1.7.0"
 
-kotlinx_coroutines = "1.6.4" # https://github.com/Kotlin/kotlinx.coroutines/releases
-kotlinx_androidx_core = "1.8.0" # https://developer.android.com/jetpack/androidx/releases/core
+kotlinx_coroutines = "1.11.0" # https://github.com/Kotlin/kotlinx.coroutines/releases
+kotlinx_androidx_core = "1.18.0" # https://developer.android.com/jetpack/androidx/releases/core
 
-google_review = "2.0.1" # https://developer.android.com/reference/com/google/android/play/core/release-notes-in_app_reviews
-google_play_services = "18.1.0" # https://developers.google.com/android/guides/releases
+google_review = "2.0.2" # https://developer.android.com/reference/com/google/android/play/core/release-notes-in_app_reviews
+google_play_services = "18.10.1" # https://developers.google.com/android/guides/releases
 
-mockito_android = "4.5.1" # https://github.com/mockito/mockito/releases
-mockito_kotlin = "4.0.0" # https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
+mockito_android = "5.23.0" # https://github.com/mockito/mockito/releases
+mockito_kotlin = "6.3.0" # https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
 
 [libraries]
 androidx_appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx_appcompat" }
