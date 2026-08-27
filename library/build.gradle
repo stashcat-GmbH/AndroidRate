@@ -1,8 +1,5 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias libs.plugins.android.library
-    alias libs.plugins.kotlin.android
 }
 
 android {
@@ -19,35 +16,7 @@ android {
         targetCompatibility rootProject.ext.javaCompatibility
     }
 
-    buildTypes {
-        release {
-            postprocessing {
-                removeUnusedCode false
-                removeUnusedResources false
-                obfuscate false
-                optimizeCode true
-                proguardFiles getDefaultProguardFile('proguard-defaults.txt'), 'project-proguard-rules.pro', 'proguard-rules.pro'
-                testProguardFile 'project-test-proguard-rules.pro'
-            }
-        }
-        debug {
-            postprocessing {
-                removeUnusedCode false
-                removeUnusedResources false
-                obfuscate false
-                optimizeCode false
-                testProguardFile 'project-test-proguard-rules.pro'
-            }
-            matchingFallbacks = ['release']
-        }
-    }
     namespace 'com.vorlonsoft.android.rate'
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_11
-    }
 }
 
 dependencies {

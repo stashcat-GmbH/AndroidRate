@@ -1,6 +1,5 @@
 [versions]
-kotlin = "2.4.10"
-android_build = "8.13.2"
+android_build = "9.3.2"
 
 androidx_appcompat = "1.8.0" # https://developer.android.com/jetpack/androidx/releases/appcompat
 androidx_constraintlayout = "2.2.2" # https://developer.android.com/jetpack/androidx/releases/appcompat
@@ -10,7 +9,7 @@ androidx_test_runner = "1.7.0"
 androidx_test_core = "1.7.0"
 
 kotlinx_coroutines = "1.11.0" # https://github.com/Kotlin/kotlinx.coroutines/releases
-kotlinx_androidx_core = "1.18.0" # https://developer.android.com/jetpack/androidx/releases/core
+kotlinx_androidx_core = "1.19.0" # https://developer.android.com/jetpack/androidx/releases/core
 
 google_review = "2.0.2" # https://developer.android.com/reference/com/google/android/play/core/release-notes-in_app_reviews
 google_play_services = "18.10.1" # https://developers.google.com/android/guides/releases
@@ -56,4 +55,3 @@ sample_implementation = [
 [plugins]
 android_application = { id = "com.android.application", version.ref = "android_build" }
 android_library = { id = "com.android.library", version.ref = "android_build" }
-kotlin_android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

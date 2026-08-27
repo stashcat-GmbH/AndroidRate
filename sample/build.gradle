@@ -1,8 +1,5 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias libs.plugins.android.application
-    alias libs.plugins.kotlin.android
 }
 
 android {
@@ -13,7 +10,7 @@ android {
         minSdkVersion rootProject.ext.androidMinSdk
         targetSdkVersion rootProject.ext.androidCompileSdk
         versionCode appVersionCode
-        versionName version
+        versionName appVersionName
     }
 
     compileOptions {
@@ -21,56 +18,24 @@ android {
         targetCompatibility rootProject.ext.javaCompatibility
     }
 
-    bundle {
-        language {
-            enableSplit = true
-        }
-        density {
-            enableSplit = true
-        }
-        abi {
-            enableSplit = true
-        }
-    }
-
     buildTypes {
-        release {
-            applicationIdSuffix ''
-            debuggable false
-            postprocessing {
-                removeUnusedCode true
-                removeUnusedResources true
-                obfuscate true
-                optimizeCode true
-                proguardFiles getDefaultProguardFile('proguard-defaults.txt'), 'project-proguard-rules.pro', 'proguard-rules.pro'
-            }
-        }
         debug {
-            applicationIdSuffix '.debug'
-            debuggable true
-            postprocessing {
-                removeUnusedCode false
-                removeUnusedResources false
-                obfuscate false
-                optimizeCode false
-            }
-            matchingFallbacks = ['release']
+            applicationIdSuffix = '.debug'
+        }
+
+        release {
+            minifyEnabled = true
+            shrinkResources = true
+
+            proguardFiles(
+                    getDefaultProguardFile('proguard-android-optimize.txt'),
+                    rootProject.file('project-proguard-rules.pro'),
+                    'proguard-rules.pro'
+            )
         }
     }
     namespace 'com.vorlonsoft.android.rate.sample'
-    applicationVariants.configureEach { variant ->
-        variant.outputs.configureEach {
-            outputFileName = "${variant.name}-${variant.versionName}.apk"
-        }
-    }
 }
-
-kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_11
-    }
-}
-
 
 dependencies {
     implementation project(':library')
