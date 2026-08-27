@@ -5,37 +5,30 @@
  */
 
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    id("kotlin-kapt")
+    alias libs.plugins.android.application
+    alias libs.plugins.kotlin.android
 }
 
 android {
-//    signingConfigs {
-//        config {
-//            storeFile file(System.getenv('STOREFILE'))
-//            storePassword System.getenv('STOREPWD')
-//            keyAlias 'Vorlonsoft LLC'
-//            keyPassword System.getenv('KEYPWD')
-//        }
-//    }
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdk rootProject.ext.androidCompileSdk
 
     defaultConfig {
         applicationId 'com.vorlonsoft.android.rate.sample'
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode version_code
+        minSdkVersion rootProject.ext.androidMinSdk
+        targetSdkVersion rootProject.ext.androidCompileSdk
+        versionCode appVersionCode
         versionName version
     }
+
     compileOptions {
-        sourceCompatibility rootProject.ext.javaVersion
-        targetCompatibility rootProject.ext.javaVersion
+        sourceCompatibility rootProject.ext.javaCompatibility
+        targetCompatibility rootProject.ext.javaCompatibility
     }
+
     kotlinOptions {
-        jvmTarget = rootProject.ext.javaVersion
+        jvmTarget = rootProject.ext.javaCompatibility.toString()
     }
+
     bundle {
         language {
             enableSplit = true
@@ -47,8 +40,9 @@ android {
             enableSplit = true
         }
     }
+
     buildTypes {
-        all {
+        configureEach {
             jniDebuggable false
             renderscriptDebuggable false
             renderscriptOptimLevel 3
@@ -86,11 +80,8 @@ android {
         }
     }
 }
+
 dependencies {
     implementation project(':library')
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:${androidx.lifecycle}"
-    implementation "androidx.constraintlayout:constraintlayout:${androidx.constraintlayout}"
-    implementation 'com.google.android.gms:play-services-base:18.1.0'
-    implementation "androidx.core:core-ktx:${ktx.core}"
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:${squareup.leakcanary}"
+    implementation libs.bundles.sample.implementation
 }

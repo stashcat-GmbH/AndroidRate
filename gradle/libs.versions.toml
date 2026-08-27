@@ -1,0 +1,59 @@
+[versions]
+kotlin = "1.7.20"
+android_build = "7.3.1"
+
+androidx_appcompat = "1.4.2" # https://developer.android.com/jetpack/androidx/releases/appcompat
+androidx_constraintlayout = "2.1.4" # https://developer.android.com/jetpack/androidx/releases/appcompat
+androidx_lifecycle = "2.5.1" # https://developer.android.com/jetpack/androidx/releases/lifecycle
+
+androidx_test_runner = "1.5.2"
+androidx_test_core = "1.5.0"
+
+kotlinx_coroutines = "1.6.4" # https://github.com/Kotlin/kotlinx.coroutines/releases
+kotlinx_androidx_core = "1.8.0" # https://developer.android.com/jetpack/androidx/releases/core
+
+google_review = "2.0.1" # https://developer.android.com/reference/com/google/android/play/core/release-notes-in_app_reviews
+google_play_services = "18.1.0" # https://developers.google.com/android/guides/releases
+
+mockito_android = "4.5.1" # https://github.com/mockito/mockito/releases
+mockito_kotlin = "4.0.0" # https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
+
+[libraries]
+androidx_appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx_appcompat" }
+androidx_constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx_constraintlayout" }
+androidx_lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx_lifecycle" }
+
+androidx_test_core = { module = "androidx.test:core", version.ref = "androidx_test_core" }
+androidx_test_runner = { module = "androidx.test:runner", version.ref = "androidx_test_runner" }
+
+kotlinx_coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx_coroutines" }
+kotlinx_androidx_core = { module = "androidx.core:core-ktx", version.ref = "kotlinx_androidx_core" }
+
+google_review = { module = "com.google.android.play:review", version.ref = "google_review" }
+google_play_services = { module = "com.google.android.gms:play-services-base", version.ref = "google_play_services" }
+
+mockito_android = { module = "org.mockito:mockito-android", version.ref = "mockito_android" }
+mockito_kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito_kotlin" }
+
+[bundles]
+library_implementation = [
+    "kotlinx_coroutines", "google_review"
+]
+
+library_api = [
+    "androidx_appcompat"
+]
+
+library_android_test = [
+    "androidx_test_core", "androidx_test_runner", "mockito_android", "mockito_kotlin"
+]
+
+sample_implementation = [
+    "androidx_appcompat", "androidx_lifecycle", "androidx_constraintlayout",
+    "kotlinx_androidx_core", "google_play_services"
+]
+
+[plugins]
+android_application = { id = "com.android.application", version.ref = "android_build" }
+android_library = { id = "com.android.library", version.ref = "android_build" }
+kotlin_android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

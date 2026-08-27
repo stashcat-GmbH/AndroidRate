@@ -4,33 +4,27 @@
  * Licensed under The MIT License (MIT)
  */
 
-buildscript {
-    ext {
-        apply from: 'dependencies.gradle'
-        version_code = 60
-    }
+// top level gradle config, put dependencies in build.gradle of module
+plugins {
+    alias libs.plugins.android.application apply false
+    alias libs.plugins.android.library apply false
+    alias libs.plugins.kotlin.android apply false
+}
 
-    repositories {
-        google()
-        mavenCentral()
-    }
+ext {
+    appVersionCode = 60
 
-    dependencies {
-        classpath "com.android.tools.build:gradle:${androidPluginVersion}"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
-    }
+    androidMinSdk = 20
+    androidCompileSdk = 31
+
+    javaCompatibility = JavaVersion.VERSION_1_8
 }
 
 allprojects {
     group GROUP
     version VERSION_NAME
-
-    repositories {
-        google()
-        mavenCentral()
-    }
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }

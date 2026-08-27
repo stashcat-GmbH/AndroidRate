@@ -5,29 +5,29 @@
  */
 
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    id("kotlin-kapt")
+    alias libs.plugins.android.library
+    alias libs.plugins.kotlin.android
 }
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdk rootProject.ext.androidCompileSdk
 
     defaultConfig {
-        //noinspection MinSdkTooLow
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.compileSdkVersion
+        minSdkVersion rootProject.ext.androidMinSdk
+        targetSdkVersion rootProject.ext.androidCompileSdk
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
+
     compileOptions {
-        sourceCompatibility javaVersion
-        targetCompatibility javaVersion
+        sourceCompatibility rootProject.ext.javaCompatibility
+        targetCompatibility rootProject.ext.javaCompatibility
     }
+
     kotlinOptions {
-        jvmTarget = javaVersion
+        jvmTarget = rootProject.ext.javaCompatibility.toString()
     }
+
     buildTypes {
         release {
             postprocessing {
@@ -52,16 +52,10 @@ android {
     }
     namespace 'com.vorlonsoft.android.rate'
 }
+
 dependencies {
+    api libs.bundles.library.api
+    implementation libs.bundles.library.implementation
 
-    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:${testLibs.mockitoKotlin}"
-    androidTestImplementation "org.mockito:mockito-android:${testLibs.mockitoAndroid}"
-    androidTestImplementation "androidx.test:core:${androidxTest.core}"
-    androidTestImplementation "androidx.test:runner:${androidxTest.runner}"
-
-    api "androidx.appcompat:appcompat:${androidx.appcompat}"
-
-    // Kotlin
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${ktx.coroutines}"
-    implementation "com.google.android.play:review:${google.review}"
+    androidTestImplementation libs.bundles.library.android.test
 }
