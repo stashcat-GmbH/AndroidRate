@@ -1,67 +1,27 @@
-/*
- * Copyright 2017 - 2018 Vorlonsoft LLC
- *
- * Licensed under The MIT License (MIT)
- */
-
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    id("kotlin-kapt")
+    alias libs.plugins.android.library
 }
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdk = rootProject.ext.androidCompileSdk
 
     defaultConfig {
-        //noinspection MinSdkTooLow
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.compileSdkVersion
+        minSdkVersion rootProject.ext.androidMinSdk
+        targetSdkVersion rootProject.ext.androidCompileSdk
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
     }
+
     compileOptions {
-        sourceCompatibility javaVersion
-        targetCompatibility javaVersion
+        sourceCompatibility rootProject.ext.javaCompatibility
+        targetCompatibility rootProject.ext.javaCompatibility
     }
-    kotlinOptions {
-        jvmTarget = javaVersion
-    }
-    buildTypes {
-        release {
-            postprocessing {
-                removeUnusedCode false
-                removeUnusedResources false
-                obfuscate false
-                optimizeCode true
-                proguardFiles getDefaultProguardFile('proguard-defaults.txt'), 'project-proguard-rules.pro', 'proguard-rules.pro'
-                testProguardFile 'project-test-proguard-rules.pro'
-            }
-        }
-        debug {
-            postprocessing {
-                removeUnusedCode false
-                removeUnusedResources false
-                obfuscate false
-                optimizeCode false
-                testProguardFile 'project-test-proguard-rules.pro'
-            }
-            matchingFallbacks = ['release']
-        }
-    }
+
     namespace 'com.vorlonsoft.android.rate'
 }
+
 dependencies {
+    api libs.bundles.library.api
+    implementation libs.bundles.library.implementation
 
-    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:${testLibs.mockitoKotlin}"
-    androidTestImplementation "org.mockito:mockito-android:${testLibs.mockitoAndroid}"
-    androidTestImplementation "androidx.test:core:${androidxTest.core}"
-    androidTestImplementation "androidx.test:runner:${androidxTest.runner}"
-
-    api "androidx.appcompat:appcompat:${androidx.appcompat}"
-
-    // Kotlin
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${ktx.coroutines}"
-    implementation "com.google.android.play:review:${google.review}"
+    androidTestImplementation libs.bundles.library.android.test
 }

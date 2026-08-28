@@ -1,96 +1,43 @@
-/*
- * Copyright 2017 - 2018 Vorlonsoft LLC
- *
- * Licensed under The MIT License (MIT)
- */
-
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    id("kotlin-kapt")
+    alias libs.plugins.android.application
 }
 
 android {
-//    signingConfigs {
-//        config {
-//            storeFile file(System.getenv('STOREFILE'))
-//            storePassword System.getenv('STOREPWD')
-//            keyAlias 'Vorlonsoft LLC'
-//            keyPassword System.getenv('KEYPWD')
-//        }
-//    }
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdk = rootProject.ext.androidCompileSdk
 
     defaultConfig {
         applicationId 'com.vorlonsoft.android.rate.sample'
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode version_code
-        versionName version
+        minSdkVersion rootProject.ext.androidMinSdk
+        targetSdkVersion rootProject.ext.androidCompileSdk
+        versionCode appVersionCode
+        versionName appVersionName
     }
+
     compileOptions {
-        sourceCompatibility rootProject.ext.javaVersion
-        targetCompatibility rootProject.ext.javaVersion
+        sourceCompatibility rootProject.ext.javaCompatibility
+        targetCompatibility rootProject.ext.javaCompatibility
     }
-    kotlinOptions {
-        jvmTarget = rootProject.ext.javaVersion
-    }
-    bundle {
-        language {
-            enableSplit = true
-        }
-        density {
-            enableSplit = true
-        }
-        abi {
-            enableSplit = true
-        }
-    }
+
     buildTypes {
-        all {
-            jniDebuggable false
-            renderscriptDebuggable false
-            renderscriptOptimLevel 3
-            embedMicroApp false
-        }
-        release {
-            applicationIdSuffix ''
-            zipAlignEnabled true
-            debuggable false
-            postprocessing {
-                removeUnusedCode true
-                removeUnusedResources true
-                obfuscate true
-                optimizeCode true
-                proguardFiles getDefaultProguardFile('proguard-defaults.txt'), 'project-proguard-rules.pro', 'proguard-rules.pro'
-            }
-        }
         debug {
-            applicationIdSuffix '.debug'
-            zipAlignEnabled false
-            debuggable true
-            postprocessing {
-                removeUnusedCode false
-                removeUnusedResources false
-                obfuscate false
-                optimizeCode false
-            }
-            matchingFallbacks = ['release']
+            applicationIdSuffix = '.debug'
+        }
+
+        release {
+            minifyEnabled = true
+            shrinkResources = true
+
+            proguardFiles(
+                    getDefaultProguardFile('proguard-android-optimize.txt'),
+                    rootProject.file('project-proguard-rules.pro'),
+                    'proguard-rules.pro'
+            )
         }
     }
     namespace 'com.vorlonsoft.android.rate.sample'
-    applicationVariants.all { variant ->
-        variant.outputs.all {
-            outputFileName = "${variant.name}-${variant.versionName}.apk"
-        }
-    }
 }
+
 dependencies {
     implementation project(':library')
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:${androidx.lifecycle}"
-    implementation "androidx.constraintlayout:constraintlayout:${androidx.constraintlayout}"
-    implementation 'com.google.android.gms:play-services-base:18.1.0'
-    implementation "androidx.core:core-ktx:${ktx.core}"
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:${squareup.leakcanary}"
+    implementation libs.bundles.sample.implementation
 }

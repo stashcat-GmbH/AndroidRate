@@ -1,36 +1,16 @@
-/*
- * Copyright 2017 - 2018 Vorlonsoft LLC
- *
- * Licensed under The MIT License (MIT)
- */
+// top level gradle config, put dependencies in build.gradle of module
 
-buildscript {
-    ext {
-        apply from: 'dependencies.gradle'
-        version_code = 60
-    }
-
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath "com.android.tools.build:gradle:${androidPluginVersion}"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
-    }
+plugins {
+    alias libs.plugins.android.application apply false
+    alias libs.plugins.android.library apply false
 }
 
-allprojects {
-    group GROUP
-    version VERSION_NAME
+ext {
+    appVersionCode = 60
+    appVersionName = '1.3.0'
 
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+    androidMinSdk = 26
+    androidCompileSdk = 37
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+    javaCompatibility = JavaVersion.VERSION_11
 }

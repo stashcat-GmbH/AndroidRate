@@ -24,7 +24,7 @@ class PreferencesTestEnv {
                 ?: it.arguments[1] as String?
         }
         whenever(getStringSet(any(), anyOrNull())).thenAnswer {
-            return@thenAnswer testSharedPreferencesMap[it.arguments[0]] as? Set<String>
+            return@thenAnswer testSharedPreferencesMap[it.arguments[0]] as? Set<*>
                 ?: it.arguments[1]
         }
         whenever(getInt(any(), anyOrNull())).thenAnswer {
