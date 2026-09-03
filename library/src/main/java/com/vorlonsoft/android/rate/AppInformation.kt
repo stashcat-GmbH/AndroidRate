@@ -18,8 +18,9 @@ import com.vorlonsoft.android.rate.Constants.Utils.TAG
 /**
  * AppInformation Object - the app information object of the AndroidRate library.
  *
- * Contains [PackageManager] exceptions constants and [getIcon], [getLongVersionCode],
- * [getPackageName], [getVersionCode], [getVersionCodeMajor], [getVersionName] functions.
+ * Contains [PackageManager] exceptions, constants and these functions:
+ * [getLongVersionCode], [getPackageName], [getVersionCode], [getVersionCodeMajor],
+ * [getVersionName].
  *
  * @since    1.2.1
  * @version  2.0.0
@@ -29,12 +30,7 @@ import com.vorlonsoft.android.rate.Constants.Utils.TAG
 internal object AppInformation {
     /** The [PackageManager.getPackageInfo] exception log message. */
     private const val packageInfoException: String = "Failed to get app package info."
-    /** The [PackageManager.getApplicationIcon] exception log message. */
-    private const val applicationIconException: String = "Failed to get app icon."
-    /** The icon associated with an application. */
-    @JvmStatic
-    private var icon: Drawable? = null
-    /** The versionCode and the versionCodeMajor combined together as a single long value. */
+    /** The versionCode and the versionCodeMajor combined as a single long value. */
     @JvmStatic
     private var longVersionCode: Long? = null
     /** The name of the app's package. */
@@ -51,25 +47,8 @@ internal object AppInformation {
     private var versionName: String? = null
 
     /**
-     * Returns the icon associated with an application.
-     *
-     * @param context context
-     * @return the image of the icon or the default application's icon if it couldn't be found, null
-     * if the resources for the application couldn't be loaded.
-     */
-    @JvmStatic
-    fun getIcon(context: Context): Drawable? {
-        if (icon == null) try {
-            icon = context.packageManager.getApplicationIcon(getPackageName(context))
-        } catch (e: PackageManager.NameNotFoundException) {
-            Log.i(TAG, applicationIconException, e)
-        }
-        return icon
-    }
-
-    /**
      * Returns the [versionCode][android.R.styleable.AndroidManifest_versionCode] and the
-     * [versionCodeMajor][android.R.styleable.AndroidManifest_versionCodeMajor] combined together as
+     * [versionCodeMajor][android.R.styleable.AndroidManifest_versionCodeMajor] combined as
      * a single long value.
      *
      * The [versionCodeMajor][android.R.styleable.AndroidManifest_versionCodeMajor] is placed in the
@@ -77,7 +56,7 @@ internal object AppInformation {
      *
      * @param context context
      * @return the [versionCode][android.R.styleable.AndroidManifest_versionCode] and the
-     * [versionCodeMajor][android.R.styleable.AndroidManifest_versionCodeMajor] combined together
+     * [versionCodeMajor][android.R.styleable.AndroidManifest_versionCodeMajor] combined
      * @see getVersionCode
      * @see getVersionCodeMajor
      */

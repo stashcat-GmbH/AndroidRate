@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AndroidRate Sample</string>
+    <string name="hello_world">Hallo Welt!</string>
+
+    <string name="new_rate_dialog_title">Bewerte Mich!</string>
+    <string name="new_rate_dialog_message">Könntest du dir einen Moment Zeit nehmen und diese App bewerten? Es dauert nicht lange, danke für deine Unterstützung!</string>
+    <string name="new_rate_dialog_never">Nein</string>
+    <string name="new_rate_dialog_later">Später</string>
+    <string name="new_rate_dialog_ok">Bewerten</string>
+    <string name="fallback_dialog_button">Fallback Dialog</string>
+    <string name="delay_button">Bewertung verzögern</string>
+    <string name="snackbar_message_delay">Bewertung verzögert</string>
+</resources>

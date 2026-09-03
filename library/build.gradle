@@ -20,7 +20,6 @@ android {
 }
 
 dependencies {
-    api libs.bundles.library.api
     implementation libs.bundles.library.implementation
 
     androidTestImplementation libs.bundles.library.android.test
