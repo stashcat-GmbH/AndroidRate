@@ -10,11 +10,9 @@ androidx_lifecycle = "2.11.0" # https://developer.android.com/jetpack/androidx/r
 androidx_test_runner = "1.7.0"
 androidx_test_core = "1.7.0"
 
-kotlinx_coroutines = "1.11.0" # https://github.com/Kotlin/kotlinx.coroutines/releases
 kotlinx_androidx_core = "1.19.0" # https://developer.android.com/jetpack/androidx/releases/core
 
 google_review = "2.0.2" # https://developer.android.com/reference/com/google/android/play/core/release-notes-in_app_reviews
-google_play_services = "18.10.1" # https://developers.google.com/android/guides/releases
 
 mockito_android = "5.23.0" # https://github.com/mockito/mockito/releases
 mockito_kotlin = "6.3.0" # https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
@@ -31,18 +29,16 @@ androidx_lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-ktx", vers
 androidx_test_core = { module = "androidx.test:core", version.ref = "androidx_test_core" }
 androidx_test_runner = { module = "androidx.test:runner", version.ref = "androidx_test_runner" }
 
-kotlinx_coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx_coroutines" }
 kotlinx_androidx_core = { module = "androidx.core:core-ktx", version.ref = "kotlinx_androidx_core" }
 
 google_review = { module = "com.google.android.play:review", version.ref = "google_review" }
-google_play_services = { module = "com.google.android.gms:play-services-base", version.ref = "google_play_services" }
 
 mockito_android = { module = "org.mockito:mockito-android", version.ref = "mockito_android" }
 mockito_kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito_kotlin" }
 
 [bundles]
 library_implementation = [
-    "kotlinx_coroutines"
+
 ]
 
 library_android_test = [
@@ -51,7 +47,7 @@ library_android_test = [
 
 sample_implementation = [
     "androidx_lifecycle", "androidx_activity_compose", "compose_ui_tooling_preview",
-    "compose_material3", "kotlinx_androidx_core", "google_play_services", "google_review"
+    "compose_material3", "kotlinx_androidx_core", "google_review"
 ]
 
 sample_debug = [
