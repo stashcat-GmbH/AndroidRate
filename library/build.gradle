@@ -1,5 +1,6 @@
 plugins {
     alias libs.plugins.android.library
+    alias libs.plugins.vanniktech.mavenPublish
 }
 
 android {
@@ -23,4 +24,39 @@ dependencies {
     implementation libs.bundles.library.implementation
 
     androidTestImplementation libs.bundles.library.android.test
+}
+
+mavenPublishing {
+    coordinates("com.stashcat", "android-rate", rootProject.ext.appVersionName)
+
+    pom {
+        name = "AndroidRate"
+        description = "The AndroidRate library allows you to track statistics about your users' basic app usage. This includes things like the number of app launches and minimum time interval since the installation date."
+        url = "https://github.com/stashcat-GmbH/AndroidRate/"
+
+        licenses {
+            license {
+                name = "MIT"
+                url = "https://opensource.org/license/mit"
+                distribution = "repo"
+            }
+        }
+
+        scm {
+            url = "https://github.com/stashcat-GmbH/AndroidRate/"
+            connection = "scm:git:https://github.com/stashcat-GmbH/AndroidRate.git"
+            developerConnection = "scm:git:ssh://git@github.com/stashcat-GmbH/AndroidRate.git"
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "agsscrepo"
+            url = uri("https://mvn.animegameservers.org/sc")
+
+            credentials(PasswordCredentials)
+        }
+    }
 }
