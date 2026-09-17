@@ -14,6 +14,7 @@ import com.vorlonsoft.android.rate.Constants.Utils.EMPTY_STRING
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  *
@@ -25,9 +26,12 @@ import kotlin.time.Duration
  * @author   Alexander Savin
  * @author   Shintaro Katafuchi
  */
-class PreferenceHelper @JvmOverloads constructor(context: Context, prefsProvider: PreferencesProvider = defaultPreferencesProvider) {
+class PreferenceHelper @JvmOverloads constructor(
+    context: Context, prefsProvider: PreferencesProvider = defaultPreferencesProvider
+) {
 
-    private val prefs = prefsProvider.getSharedPreferences(context, PREF_FILE_NAME, Context.MODE_PRIVATE)
+    private val prefs =
+        prefsProvider.getSharedPreferences(context, PREF_FILE_NAME, Context.MODE_PRIVATE)
 
     interface PreferencesProvider {
         fun getSharedPreferences(context: Context, name: String, mode: Int): SharedPreferences
@@ -112,9 +116,8 @@ class PreferenceHelper @JvmOverloads constructor(context: Context, prefsProvider
      *
      * Clears data in shared preferences.
      *
-     * @param context context
      */
-    fun clearSharedPreferences() = prefs.edit{ clear() }
+    fun clearSharedPreferences() = prefs.edit { clear() }
 
     fun isFirstLaunch(): Boolean =
         prefs.getLong(PREF_KEY_INSTALL_DATE, 0L) == 0L
@@ -140,8 +143,8 @@ class PreferenceHelper @JvmOverloads constructor(context: Context, prefsProvider
     }
 
     fun increment365DayPeriodDialogLaunchTimes() {
-        var currentDay =
-            ((Date().time - getDialogFirstLaunchTime()) / Time.DAY).toShort()
+        val timeDeltaMillis = Date().time - getDialogFirstLaunchTime()
+        var currentDay = (timeDeltaMillis.milliseconds.inWholeDays).toShort()
         val currentYear: Byte = (currentDay / YEAR_IN_DAYS).toByte()
         val currentDialogLaunchTimes = prefs
             .getString(PREF_KEY_365_DAY_PERIOD_DIALOG_LAUNCH_TIMES, DEFAULT_DIALOG_LAUNCH_TIMES)
@@ -177,8 +180,8 @@ class PreferenceHelper @JvmOverloads constructor(context: Context, prefsProvider
     }
 
     fun get365DayPeriodDialogLaunchTimes(): Short {
-        var currentDay =
-            ((Date().time - getDialogFirstLaunchTime()) / Time.DAY).toShort()
+        val timeDeltaMillis = Date().time - getDialogFirstLaunchTime()
+        var currentDay = (timeDeltaMillis.milliseconds.inWholeDays).toShort()
         val currentYear: Byte = (currentDay / YEAR_IN_DAYS).toByte()
         var dialogLaunchTimes = prefs
             .getString(PREF_KEY_365_DAY_PERIOD_DIALOG_LAUNCH_TIMES, DEFAULT_DIALOG_LAUNCH_TIMES)

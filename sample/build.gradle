@@ -1,5 +1,6 @@
 plugins {
     alias libs.plugins.android.application
+    alias libs.plugins.compose.compiler
 }
 
 android {
@@ -16,6 +17,10 @@ android {
     compileOptions {
         sourceCompatibility rootProject.ext.javaCompatibility
         targetCompatibility rootProject.ext.javaCompatibility
+    }
+
+    buildFeatures {
+        compose true
     }
 
     buildTypes {
@@ -39,5 +44,8 @@ android {
 
 dependencies {
     implementation project(':library')
+    implementation platform(libs.compose.bom)
     implementation libs.bundles.sample.implementation
+
+    debugImplementation libs.bundles.sample.debug
 }

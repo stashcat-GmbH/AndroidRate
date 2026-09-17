@@ -1,18 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ // Copyright 2017 - 2018 Vorlonsoft LLC
   ~ //
   ~ // Licensed under The MIT License (MIT)
 -->
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name" tools:ignore="MissingTranslation">AndroidRate Sample</string>
-    <string name="hello_world" tools:ignore="MissingTranslation">Hello world!</string>
+<resources>
+    <!-- Untranslatable strings. -->
+    <string name="rate_dialog_ic_launcher_description" translatable="false">App launcher icon.</string>
 
-    <string name="new_rate_dialog_title" tools:ignore="MissingTranslation">Rate Me!</string>
-    <string name="new_rate_dialog_message" tools:ignore="MissingTranslation" tools:keep="@string/new_rate_dialog_message">If you enjoy playing this app, would you mind taking a moment to rate it? It won\'t take more than a minute. Thanks for your support!</string>
-    <string name="new_rate_dialog_never" tools:ignore="MissingTranslation">Never</string>
-    <string name="new_rate_dialog_later" tools:ignore="MissingTranslation">Later</string>
-    <string name="new_rate_dialog_ok" tools:ignore="MissingTranslation">Rate</string>
-    <string name="in_app_review_button" translatable="false">In App Review Test</string>
-    <string name="delay_button" translatable="false">Delay Test</string>
+    <string name="app_name">AndroidRate Sample</string>
+    <string name="hello_world">Hello world!</string>
+
+    <string name="new_rate_dialog_title">Rate Me!</string>
+    <string name="new_rate_dialog_message">If you enjoy playing this app, would you mind taking a moment to rate it? It won\'t take more than a minute. Thanks for your support!</string>
+    <string name="new_rate_dialog_never">Never</string>
+    <string name="new_rate_dialog_later">Later</string>
+    <string name="new_rate_dialog_ok">Rate</string>
+    <string name="fallback_dialog_button">Fallback Dialog</string>
+    <string name="delay_button">Delay Test</string>
+    <string name="snackbar_message_delay">Rating delayed</string>
 </resources>

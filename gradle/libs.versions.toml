@@ -1,46 +1,44 @@
 [versions]
-android_build = "9.3.2"
+android_build = "9.4.0"
+kotlin = "2.4.20"
 
-androidx_appcompat = "1.8.0" # https://developer.android.com/jetpack/androidx/releases/appcompat
-androidx_constraintlayout = "2.2.2" # https://developer.android.com/jetpack/androidx/releases/appcompat
+compose_bom = "2026.09.00" # https://developer.android.com/develop/ui/compose/bom/bom-mapping
+
+androidx_activity = "1.13.0" # https://developer.android.com/jetpack/androidx/releases/activity
 androidx_lifecycle = "2.11.0" # https://developer.android.com/jetpack/androidx/releases/lifecycle
 
 androidx_test_runner = "1.7.0"
 androidx_test_core = "1.7.0"
 
-kotlinx_coroutines = "1.11.0" # https://github.com/Kotlin/kotlinx.coroutines/releases
 kotlinx_androidx_core = "1.19.0" # https://developer.android.com/jetpack/androidx/releases/core
 
 google_review = "2.0.2" # https://developer.android.com/reference/com/google/android/play/core/release-notes-in_app_reviews
-google_play_services = "18.10.1" # https://developers.google.com/android/guides/releases
 
 mockito_android = "5.23.0" # https://github.com/mockito/mockito/releases
 mockito_kotlin = "6.3.0" # https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
 
 [libraries]
-androidx_appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx_appcompat" }
-androidx_constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx_constraintlayout" }
+compose_bom = { module = "androidx.compose:compose-bom", version.ref = "compose_bom" }
+compose_material3 = { module = "androidx.compose.material3:material3" }
+compose_ui_tooling_preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+compose_ui_tooling = { module = "androidx.compose.ui:ui-tooling" }
+
+androidx_activity_compose = { module = "androidx.activity:activity-compose", version.ref = "androidx_activity" }
 androidx_lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx_lifecycle" }
 
 androidx_test_core = { module = "androidx.test:core", version.ref = "androidx_test_core" }
 androidx_test_runner = { module = "androidx.test:runner", version.ref = "androidx_test_runner" }
 
-kotlinx_coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx_coroutines" }
 kotlinx_androidx_core = { module = "androidx.core:core-ktx", version.ref = "kotlinx_androidx_core" }
 
 google_review = { module = "com.google.android.play:review", version.ref = "google_review" }
-google_play_services = { module = "com.google.android.gms:play-services-base", version.ref = "google_play_services" }
 
 mockito_android = { module = "org.mockito:mockito-android", version.ref = "mockito_android" }
 mockito_kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito_kotlin" }
 
 [bundles]
 library_implementation = [
-    "kotlinx_coroutines", "google_review"
-]
 
-library_api = [
-    "androidx_appcompat"
 ]
 
 library_android_test = [
@@ -48,10 +46,15 @@ library_android_test = [
 ]
 
 sample_implementation = [
-    "androidx_appcompat", "androidx_lifecycle", "androidx_constraintlayout",
-    "kotlinx_androidx_core", "google_play_services"
+    "androidx_lifecycle", "androidx_activity_compose", "compose_ui_tooling_preview",
+    "compose_material3", "kotlinx_androidx_core", "google_review"
+]
+
+sample_debug = [
+    "compose_ui_tooling"
 ]
 
 [plugins]
 android_application = { id = "com.android.application", version.ref = "android_build" }
 android_library = { id = "com.android.library", version.ref = "android_build" }
+compose_compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

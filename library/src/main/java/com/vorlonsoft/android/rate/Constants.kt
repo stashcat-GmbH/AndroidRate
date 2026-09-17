@@ -42,15 +42,7 @@ internal object Constants {
     internal object Utils {
         /** The empty String. */
         internal const val EMPTY_STRING: String = ""
-        /** The empty array of Strings. */
-        @JvmField
-        internal val EMPTY_STRING_ARRAY: Array<String?> = arrayOfNulls(0)
-        /** The part 1 of some log messages of AndroidRate library. */
-        internal const val LOG_MESSAGE_PART_1: String = "Failed to rate app, "
         /** The tag of all log messages of AndroidRate library. */
         internal const val TAG: String = "ANDROIDRATE"
-        /** The part 2 of a utility class unsupported operation exception message. */
-        internal const val UTILITY_CLASS_MESSAGE: String = " is a utility class and it can't be " +
-                                                   "instantiated!"
     }
 }
