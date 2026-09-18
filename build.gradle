@@ -14,7 +14,7 @@ plugins {
 
 ext {
     appVersionCode = 60
-    appVersionName = "3.0.0"
+    appVersionName = providers.gradleProperty("VERSION_NAME").get()
 
     androidMinSdk = 26
     androidCompileSdk = 37

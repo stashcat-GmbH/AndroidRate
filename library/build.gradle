@@ -5,6 +5,7 @@ plugins {
 
 android {
     compileSdk = rootProject.ext.androidCompileSdk
+    namespace 'com.vorlonsoft.android.rate'
 
     defaultConfig {
         minSdkVersion rootProject.ext.androidMinSdk
@@ -16,8 +17,6 @@ android {
         sourceCompatibility rootProject.ext.javaCompatibility
         targetCompatibility rootProject.ext.javaCompatibility
     }
-
-    namespace 'com.vorlonsoft.android.rate'
 }
 
 dependencies {
@@ -26,26 +25,11 @@ dependencies {
     androidTestImplementation libs.bundles.library.android.test
 }
 
-mavenPublishing {
-    coordinates("com.stashcat", "android-rate", rootProject.ext.appVersionName)
-
-    pom {
-        name = "AndroidRate"
-        description = "The AndroidRate library allows you to track statistics about your users' basic app usage. This includes things like the number of app launches and minimum time interval since the installation date."
-        url = "https://github.com/stashcat-GmbH/AndroidRate/"
-
-        licenses {
-            license {
-                name = "MIT"
-                url = "https://opensource.org/license/mit"
-                distribution = "repo"
-            }
-        }
-
-        scm {
-            url = "https://github.com/stashcat-GmbH/AndroidRate/"
-            connection = "scm:git:https://github.com/stashcat-GmbH/AndroidRate.git"
-            developerConnection = "scm:git:ssh://git@github.com/stashcat-GmbH/AndroidRate.git"
+// put license into aar and jar artifacts
+tasks.withType(Zip).configureEach {
+    if (name in ["bundleReleaseAar", "sourceReleaseJar", "javaDocReleaseJar"]) {
+        from(rootProject.file("LICENSE")) {
+            into("META-INF/com/stashcat/androidrate")
         }
     }
 }
