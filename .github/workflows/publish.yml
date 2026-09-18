@@ -1,0 +1,36 @@
+name: Publish AndroidRate
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    if: github.event.created
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout tagged commit
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Build and publish
+        env:
+          ORG_GRADLE_PROJECT_agsscrepoUsername: ${{ secrets.MAVEN_USERNAME }}
+          ORG_GRADLE_PROJECT_agsscrepoPassword: ${{ secrets.MAVEN_SECRET }}
+        run: ./gradlew :library:publishMavenPublicationToAgsscrepoRepository --no-daemon --stacktrace
