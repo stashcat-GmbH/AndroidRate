@@ -2,6 +2,8 @@
 android_build = "9.4.0"
 kotlin = "2.4.20"
 
+maven_publish = "0.37.0" # https://github.com/vanniktech/gradle-maven-publish-plugin/releases
+
 compose_bom = "2026.09.00" # https://developer.android.com/develop/ui/compose/bom/bom-mapping
 
 androidx_activity = "1.13.0" # https://developer.android.com/jetpack/androidx/releases/activity
@@ -58,3 +60,4 @@ sample_debug = [
 android_application = { id = "com.android.application", version.ref = "android_build" }
 android_library = { id = "com.android.library", version.ref = "android_build" }
 compose_compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "maven_publish" }

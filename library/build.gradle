@@ -1,9 +1,11 @@
 plugins {
     alias libs.plugins.android.library
+    alias libs.plugins.vanniktech.mavenPublish
 }
 
 android {
     compileSdk = rootProject.ext.androidCompileSdk
+    namespace 'com.vorlonsoft.android.rate'
 
     defaultConfig {
         minSdkVersion rootProject.ext.androidMinSdk
@@ -15,12 +17,30 @@ android {
         sourceCompatibility rootProject.ext.javaCompatibility
         targetCompatibility rootProject.ext.javaCompatibility
     }
-
-    namespace 'com.vorlonsoft.android.rate'
 }
 
 dependencies {
     implementation libs.bundles.library.implementation
 
     androidTestImplementation libs.bundles.library.android.test
+}
+
+// put license into aar and jar artifacts
+tasks.withType(Zip).configureEach {
+    if (name in ["bundleReleaseAar", "sourceReleaseJar", "javaDocReleaseJar"]) {
+        from(rootProject.file("LICENSE")) {
+            into("META-INF/com/stashcat/androidrate")
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "agsscrepo"
+            url = uri("https://mvn.animegameservers.org/sc")
+
+            credentials(PasswordCredentials)
+        }
+    }
 }
